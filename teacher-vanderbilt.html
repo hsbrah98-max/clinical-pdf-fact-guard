@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teacher ADHD rating form</title>
+<style>
+  :root { --ink:#1d2433; --muted:#5b6475; --line:#d7dde5; --teal:#2c5d63; --soft:#eef6f6; --warn:#7a3e00; --bad:#a33; }
+  * { box-sizing: border-box; }
+  body { font: 15px/1.45 -apple-system, Helvetica, Arial, sans-serif; color: var(--ink); max-width: 860px; margin: 24px auto; padding: 0 16px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin-bottom: 18px; }
+  fieldset { border: 1px solid var(--line); border-radius: 8px; margin: 0 0 18px; padding: 12px 14px; }
+  legend { font-weight: 600; color: var(--teal); padding: 0 6px; }
+  .info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .info label { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); }
+  .info input, .info select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); }
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 12px; color: var(--muted); font-weight: 500; text-align: center; padding: 4px 2px; position: sticky; top: 0; background: #fff; }
+  th:nth-child(2) { text-align: left; }
+  td { border-top: 1px solid #eef1f5; padding: 5px 2px; vertical-align: middle; }
+  td.n { color: var(--muted); width: 28px; font-size: 13px; }
+  td.r { text-align: center; width: 72px; }
+  td.r input { width: 18px; height: 18px; cursor: pointer; }
+  tr.missing td { background: #fdecec; }
+  .group td { background: #f6f8fa; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  button { font: inherit; background: var(--teal); color: #fff; border: 0; border-radius: 6px; padding: 10px 22px; cursor: pointer; }
+  button.secondary { background: #fff; color: var(--teal); border: 1px solid var(--teal); }
+  .err { color: var(--bad); margin-left: 12px; }
+  #result { display: none; }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }
+  .flag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+  .yes { background: #fdecec; color: var(--bad); }
+  .no { background: #eaf5ec; color: #2c6b3a; }
+  .res-table td { padding: 6px 4px; }
+  .res-table td:first-child { width: 46%; }
+  .note { font-size: 12px; color: var(--muted); }
+  .foot { font-size: 11px; color: var(--muted); margin-top: 22px; border-top: 1px solid var(--line); padding-top: 8px; }
+  @media print {
+    body { margin: 0; font-size: 12px; }
+    #form, .noprint { display: none !important; }
+    #result { display: block !important; }
+    .card { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div id="form">
+  <h1>Teacher ADHD rating form</h1>
+  <div class="sub">About 10 minutes. Base your answers on what you have seen in your classroom. Nothing you enter leaves this page.</div>
+
+  <fieldset>
+    <legend>About the student</legend>
+    <div class="info">
+      <label>Student name<input id="student" autocomplete="off"></label>
+      <label>Grade<input id="grade" autocomplete="off"></label>
+      <label>Your name<input id="teacher" autocomplete="off"></label>
+      <label>Class or subject<input id="subject" autocomplete="off"></label>
+      <label>How long have you taught this student?<input id="known" placeholder="e.g. since August" autocomplete="off"></label>
+      <label>Today's date<input id="date" type="date"></label>
+      <label>Were your observations made while the student was
+        <select id="meds"><option value="">Choose one</option><option>on medication</option><option>not on medication</option><option>not sure</option></select>
+      </label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Behavior in the past few weeks</legend>
+    <table id="symptoms"></table>
+  </fieldset>
+
+  <fieldset>
+    <legend>Performance</legend>
+    <table id="performance"></table>
+  </fieldset>
+
+  <button id="done">Done</button><span class="err" id="err"></span>
+</div>
+
+<div id="result">
+  <div class="noprint" style="margin-bottom:14px">
+    <button onclick="window.print()">Print or save as PDF</button>
+    <button class="secondary" onclick="backToForm()">Edit answers</button>
+  </div>
+  <div id="report"></div>
+</div>
+
+<div class="foot">Items from the NICHQ Vanderbilt Assessment Scale, Teacher Informant. Copyright American Academy of Pediatrics and NICHQ. Snowpine internal prototype, not licensed for commercial use. A screening result is not a diagnosis.</div>
+
+<script>
+const SYMPTOMS = [
+  // Inattentive 1-9
+  "Fails to give attention to details or makes careless mistakes in schoolwork",
+  "Has difficulty sustaining attention to tasks or activities",
+  "Does not seem to listen when spoken to directly",
+  "Does not follow through on instructions and fails to finish schoolwork (not due to oppositional behavior or failure to understand)",
+  "Has difficulty organizing tasks and activities",
+  "Avoids, dislikes, or is reluctant to engage in tasks that require sustained mental effort",
+  "Loses things necessary for tasks or activities (school assignments, pencils, or books)",
+  "Is easily distracted by extraneous stimuli",
+  "Is forgetful in daily activities",
+  // Hyperactive/impulsive 10-18
+  "Fidgets with hands or feet or squirms in seat",
+  "Leaves seat in classroom or in other situations in which remaining seated is expected",
+  "Runs about or climbs excessively in situations in which remaining seated is expected",
+  "Has difficulty playing or engaging in leisure activities quietly",
+  "Is “on the go” or often acts as if “driven by a motor”",
+  "Talks excessively",
+  "Blurts out answers before questions have been completed",
+  "Has difficulty waiting in line",
+  "Interrupts or intrudes on others (e.g., butts into conversations or games)",
+  // Oppositional/conduct 19-28
+  "Loses temper",
+  "Actively defies or refuses to comply with adults’ requests or rules",
+  "Is angry or resentful",
+  "Is spiteful and vindictive",
+  "Bullies, threatens, or intimidates others",
+  "Initiates physical fights",
+  "Lies to obtain goods for favors or to avoid obligations (e.g., “cons” others)",
+  "Is physically cruel to people",
+  "Has stolen items of nontrivial value",
+  "Deliberately destroys others’ property",
+  // Anxiety/depression 29-35
+  "Is fearful, anxious, or worried",
+  "Is self-conscious or easily embarrassed",
+  "Is afraid to try new things for fear of making mistakes",
+  "Feels worthless or inferior",
+  "Blames self for problems; feels guilty",
+  "Feels lonely, unwanted, or unloved; complains that “no one loves him or her”",
+  "Is sad, unhappy, or depressed",
+];
+const SYM_GROUPS = { 1: "Attention", 10: "Activity and impulse control", 19: "Mood and conduct", 29: "Worry and sadness" };
+const SYM_SCALE = ["Never", "Occasionally", "Often", "Very often"];   // scored 0-3
+
+const PERF = [
+  ["Academic", "Reading"], ["Academic", "Mathematics"], ["Academic", "Written expression"],
+  ["Classroom behavior", "Relationship with peers"], ["Classroom behavior", "Following directions"],
+  ["Classroom behavior", "Disrupting class"], ["Classroom behavior", "Assignment completion"],
+  ["Classroom behavior", "Organizational skills"],
+];
+const PERF_SCALE = ["Excellent", "Above average", "Average", "Somewhat of a problem", "Problematic"]; // scored 1-5
+
+function buildTable(id, items, scale, start, groupFor) {
+  const t = document.getElementById(id);
+  let h = "<tr><th></th><th></th>" + scale.map(s => `<th>${s}</th>`).join("") + "</tr>";
+  items.forEach((text, i) => {
+    const n = start + i, g = groupFor(n, i);
+    if (g) h += `<tr class="group"><td></td><td colspan="${scale.length + 1}">${g}</td></tr>`;
+    h += `<tr id="row${n}"><td class="n">${n}</td><td>${text}</td>` +
+      scale.map((_, v) => `<td class="r"><input type="radio" name="q${n}" value="${v}" aria-label="${scale[v]}"></td>`).join("") + "</tr>";
+  });
+  t.innerHTML = h;
+}
+buildTable("symptoms", SYMPTOMS, SYM_SCALE, 1, n => SYM_GROUPS[n]);
+buildTable("performance", PERF.map(p => p[1]), PERF_SCALE, 36, (n, i) => i === 0 || PERF[i][0] !== PERF[i - 1][0] ? PERF[i][0] : null);
+document.getElementById("date").valueAsDate = new Date();
+
+const val = n => { const r = document.querySelector(`input[name=q${n}]:checked`); return r ? +r.value : null; };
+const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function score() {
+  const s = {};
+  range(1, 43).forEach(n => s[n] = val(n));
+  const sym = n => s[n];                      // 0-3
+  const perf = n => s[n] + 1;                 // stored 0-4, scored 1-5
+  const positive = ns => ns.filter(n => sym(n) >= 2);
+  const inatt = positive(range(1, 9)), hyper = positive(range(10, 18));
+  const odd = positive(range(19, 28)), anx = positive(range(29, 35));
+  const impaired = range(36, 43).filter(n => perf(n) >= 4);
+  const impairment = impaired.length > 0;
+  return {
+    inatt, hyper, odd, anx, impaired, impairment,
+    totalSymptom: range(1, 18).reduce((a, n) => a + sym(n), 0),
+    avgPerf: (range(36, 43).reduce((a, n) => a + perf(n), 0) / 8).toFixed(1),
+    criteria: {
+      inattentive: inatt.length >= 6,
+      hyperactive: hyper.length >= 6,
+      oddcd: odd.length >= 3,
+      anxdep: anx.length >= 3,
+    },
+    s, perf,
+  };
+}
+
+function flag(on) { return `<span class="flag ${on ? "yes" : "no"}">${on ? "Meets screen" : "Below threshold"}</span>`; }
+function itemList(ns) { return ns.length ? ns.map(n => n <= 35 ? SYMPTOMS[n - 1] : PERF[n - 36][1]).map(esc).join("; ") : "none"; }
+
+function render(r) {
+  const f = id => esc(document.getElementById(id).value || "not given");
+  const c = r.criteria;
+  let presentation = "Does not meet ADHD symptom criteria";
+  if (c.inattentive && c.hyperactive) presentation = "Combined presentation";
+  else if (c.inattentive) presentation = "Predominantly inattentive presentation";
+  else if (c.hyperactive) presentation = "Predominantly hyperactive/impulsive presentation";
+  const adhdSymptoms = c.inattentive || c.hyperactive;
+
+  document.getElementById("report").innerHTML = `
+    <h1>Teacher rating: ${f("student")}</h1>
+    <div class="sub">Grade ${f("grade")} · ${f("teacher")}, ${f("subject")} · taught ${f("known")} · rated ${f("date")} · observed ${f("meds")}</div>
+
+    <div class="card">
+      <b>ADHD screen: ${presentation}${adhdSymptoms ? (r.impairment ? ", with classroom impairment" : ", but no classroom impairment reported") : ""}</b>
+      <div class="note">ADHD screen is positive only when symptom criteria are met <i>and</i> at least one performance item is rated 4 or 5.</div>
+    </div>
+
+    <div class="card">
+      <table class="res-table">
+        <tr><td>Inattention (items 1 to 9)</td><td>${r.inatt.length} of 9 rated often or very often</td><td>${flag(c.inattentive)}</td></tr>
+        <tr><td>Hyperactivity/impulsivity (items 10 to 18)</td><td>${r.hyper.length} of 9</td><td>${flag(c.hyperactive)}</td></tr>
+        <tr><td>Oppositional/conduct (items 19 to 28)</td><td>${r.odd.length} of 10</td><td>${flag(c.oddcd)}</td></tr>
+        <tr><td>Anxiety/depression (items 29 to 35)</td><td>${r.anx.length} of 7</td><td>${flag(c.anxdep)}</td></tr>
+        <tr><td>Classroom impairment (items 36 to 43)</td><td>${r.impaired.length} of 8 rated 4 or 5</td><td>${flag(r.impairment)}</td></tr>
+      </table>
+      <div class="note" style="margin-top:6px">Total ADHD symptom score (items 1 to 18): ${r.totalSymptom} of 54 · Average performance score: ${r.avgPerf} of 5. Track both across repeat ratings.</div>
+    </div>
+
+    <div class="card">
+      <div><b>Rated often or very often.</b> Attention: ${itemList(r.inatt)}.</div>
+      <div style="margin-top:4px">Activity and impulse: ${itemList(r.hyper)}.</div>
+      ${r.odd.length ? `<div style="margin-top:4px">Mood and conduct: ${itemList(r.odd)}.</div>` : ""}
+      ${r.anx.length ? `<div style="margin-top:4px">Worry and sadness: ${itemList(r.anx)}.</div>` : ""}
+      <div style="margin-top:4px"><b>Performance problems:</b> ${itemList(r.impaired)}.</div>
+    </div>
+    ${r.anx.length ? `<div class="card" style="border-color:#f0b55a"><b>Note for the clinician:</b> the teacher endorsed ${r.anx.length} anxiety or mood item(s). Review them whatever the ADHD result.</div>` : ""}
+  `;
+}
+
+document.getElementById("done").onclick = () => {
+  const missing = range(1, 43).filter(n => val(n) === null);
+  document.querySelectorAll("tr.missing").forEach(tr => tr.classList.remove("missing"));
+  missing.forEach(n => document.getElementById("row" + n).classList.add("missing"));
+  const err = document.getElementById("err");
+  if (missing.length) {
+    err.textContent = `${missing.length} question(s) still need an answer. They are highlighted.`;
+    document.getElementById("row" + missing[0]).scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
+  err.textContent = "";
+  render(score());
+  document.getElementById("form").style.display = "none";
+  document.getElementById("result").style.display = "block";
+  window.scrollTo(0, 0);
+};
+
+function backToForm() {
+  document.getElementById("result").style.display = "none";
+  document.getElementById("form").style.display = "block";
+}
+</script>
+</body>
+</html>

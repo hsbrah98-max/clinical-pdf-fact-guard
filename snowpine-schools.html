@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snowpine Schools · demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#F5F6F2; --surface:#FFFFFF; --sunken:#ECEFE9; --raised:#FAFBF8; --ink:#0F1714; --muted:#55625B;
+    --line:#D8DED6; --line-soft:#E7EBE4; --pine:#1F4C3D; --pine-soft:#E2ECE6; --moss:#6E8C7D;
+    --frost:#356E8C; --frost-soft:#E3EDF2; --amber:#8A5A12; --amber-soft:#F6EBD6; --danger:#9C4526; --danger-soft:#F5E7E1;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 14.5px/1.5 "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif; }
+  h1, h2, h3 { font-family: Newsreader, Georgia, serif; font-weight: 600; letter-spacing: -.01em; margin: 0; }
+  h1 { font-size: 30px; } h2 { font-size: 22px; } h3 { font-size: 17px; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+  button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--pine); background: var(--pine); color: #fff; padding: 7px 14px; }
+  button.ghost { background: var(--surface); color: var(--pine); }
+  button.small { padding: 3px 10px; font-size: 13px; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  input[type=text], select { font: inherit; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); }
+
+  /* top bar */
+  .demo { background: var(--ink); color: #cfd8d2; font-size: 12px; text-align: center; padding: 5px; }
+  .demo a { color: #fff; }
+  header { background: var(--surface); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+  .bar { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 14px; padding: 10px 20px; }
+  .bar > button { white-space: nowrap; }
+  .logo { font-family: Newsreader, serif; font-size: 21px; font-weight: 600; color: var(--pine); white-space: nowrap; }
+  .logo span { color: var(--moss); font-weight: 500; }
+  nav { display: flex; gap: 2px; flex-wrap: wrap; }
+  nav .sep { width: 1px; background: var(--line); margin: 6px 6px; }
+  nav button { background: transparent; border: 0; color: var(--muted); padding: 6px 8px; font-size: 13.5px; white-space: nowrap; }
+  nav button .n { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--moss); margin-right: 5px; }
+  nav button.on { background: var(--pine-soft); color: var(--pine); font-weight: 600; }
+  .spacer { flex: 1; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 26px 20px 60px; }
+  .view { display: none; } .view.on { display: block; }
+  .lede { color: var(--muted); max-width: 720px; margin: 6px 0 20px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+  .grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); } .g4 { grid-template-columns: repeat(4, 1fr); } .g5 { grid-template-columns: repeat(5, 1fr); }
+  .label { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--moss); }
+  .big { font-family: Newsreader, serif; font-size: 34px; font-weight: 600; line-height: 1.1; }
+  .muted { color: var(--muted); } .small-t { font-size: 12.5px; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .c-none { background: var(--sunken); color: var(--muted); }
+  .c-ok { background: var(--pine-soft); color: var(--pine); }
+  .c-info { background: var(--frost-soft); color: var(--frost); }
+  .c-warn { background: var(--amber-soft); color: var(--amber); }
+  .c-bad { background: var(--danger-soft); color: var(--danger); }
+  .toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 8px; opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 20; }
+  .toast.on { opacity: 1; }
+
+  /* overview */
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 18px 0 22px; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; cursor: pointer; }
+  .step:hover { border-color: var(--pine); }
+  .step .who { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--moss); text-transform: uppercase; }
+  .step b { display: block; margin: 4px 0; font-family: Newsreader, serif; font-size: 17px; }
+  .money td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  .checklist li { margin: 5px 0; }
+
+  /* tables */
+  table.list { width: 100%; border-collapse: collapse; }
+  table.list th { text-align: left; font-size: 12px; font-weight: 500; color: var(--muted); padding: 7px 8px; border-bottom: 1px solid var(--line); }
+  table.list td { padding: 8px; border-bottom: 1px solid var(--line-soft); }
+  table.list tr.row { cursor: pointer; } table.list tr.row:hover td { background: var(--raised); }
+  table.list tr.sel td { background: var(--pine-soft); }
+
+  /* counselor */
+  .split { display: grid; grid-template-columns: 1fr 380px; gap: 16px; align-items: start; }
+  .split.inbox-split { grid-template-columns: 320px 1fr; }
+  .split > *, .grid > * { min-width: 0; }
+  .urgent { background: var(--danger-soft); border: 1px solid #e2b9a7; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
+  .urgent h3 { color: var(--danger); }
+  .drawer { position: sticky; top: 74px; }
+  .drawer .sec { border-top: 1px solid var(--line-soft); padding-top: 10px; margin-top: 10px; }
+  .drop { border: 1.5px dashed var(--line); border-radius: 8px; padding: 12px; text-align: center; color: var(--muted); font-size: 13px; cursor: pointer; }
+  .drop:hover { border-color: var(--pine); color: var(--pine); }
+  .doc { display: flex; gap: 8px; align-items: center; font-size: 13px; margin: 3px 0; }
+  .filters { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+  .filters button { background: var(--surface); color: var(--muted); border-color: var(--line); padding: 3px 11px; font-size: 13px; }
+  .filters button.on { background: var(--pine); color: #fff; border-color: var(--pine); }
+
+  /* student screening */
+  .kiosk { max-width: 760px; margin: 0 auto; }
+  .q { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 8px 0; }
+  .q.missing { border-color: var(--danger); background: var(--danger-soft); }
+  .q p { margin: 0 0 8px; }
+  .opts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opts label { border: 1px solid var(--line); border-radius: 18px; padding: 4px 12px; cursor: pointer; font-size: 13.5px; user-select: none; }
+  .opts input { display: none; }
+  .opts input:checked + span { color: #fff; }
+  .opts label:has(input:checked) { background: var(--pine); border-color: var(--pine); color: #fff; }
+  .crisis { background: var(--frost-soft); border-radius: 10px; padding: 14px 16px; margin-top: 16px; }
+
+  /* teacher */
+  .frame { width: 100%; height: 1500px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+
+  /* family */
+  .letter { max-width: 760px; }
+  .result-line { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+  .choice { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--surface); }
+  .practice { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--surface); cursor: pointer; }
+  .practice.on { border: 2px solid var(--pine); padding: 13px; }
+  .consent label { display: flex; gap: 9px; align-items: flex-start; margin: 7px 0; }
+
+  /* psychiatrist */
+  .inbox-item { padding: 11px 12px; border-bottom: 1px solid var(--line-soft); cursor: pointer; }
+  .inbox-item:hover { background: var(--raised); }
+  .inbox-item.on { background: var(--pine-soft); }
+  .packet h3 { margin-top: 18px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+  .packet ul { margin: 6px 0; padding-left: 18px; }
+  .packet li { margin: 3px 0; }
+  .src { font-family: "IBM Plex Mono", monospace; font-size: 10.5px; color: var(--moss); margin-left: 6px; white-space: nowrap; }
+  .gap-item { background: var(--amber-soft); border-radius: 6px; padding: 7px 10px; margin: 5px 0; }
+  .gap-item.resolved { background: var(--pine-soft); }
+  .lettercard { background: var(--frost-soft); border-radius: 8px; padding: 12px 14px; }
+  .locked { color: var(--muted); font-style: italic; }
+
+  /* audience pages */
+  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; align-items: start; margin-bottom: 22px; }
+  .hero h1 { font-size: 36px; line-height: 1.12; }
+  .cta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .faq { border-top: 1px solid var(--line); padding: 14px 0; }
+  .faq b { font-family: Newsreader, serif; font-size: 18px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .faq p { margin: 0; max-width: 820px; }
+  .gets li { margin: 6px 0; }
+  .cite { font-size: 12px; color: var(--muted); }
+  /* tour */
+  .tourbox { position: fixed; right: 22px; bottom: 22px; width: 380px; background: var(--ink); color: #e6ede8; border-radius: 12px; padding: 16px 18px; z-index: 30; box-shadow: 0 10px 30px rgba(0,0,0,.25); display: none; }
+  .tourbox.on { display: block; }
+  .tourbox .label { color: #9fb5a9; }
+  .tourbox h3 { color: #fff; margin: 4px 0 6px; }
+  .tourbox p { margin: 0 0 12px; font-size: 14px; }
+  .tourbox button { background: #fff; color: var(--ink); border-color: #fff; }
+  .tourbox button.ghost { background: transparent; color: #cfd8d2; border-color: #55625b; }
+  .tour-hi { outline: 3px solid #d9a441 !important; outline-offset: 4px; border-radius: 10px; transition: outline-color .3s; }
+  /* directory + settings */
+  .dirbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 12px; }
+  .practice.off { opacity: .55; cursor: not-allowed; }
+  .tagrow { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .settings-grid label { display: flex; gap: 8px; align-items: center; margin: 4px 0; }
+  .preview { background: var(--sunken); border-radius: 8px; padding: 12px 14px; }
+  .donelist li { list-style: none; margin: 3px 0; }
+  .donelist { padding-left: 0; }
+  /* follow-up + report */
+  .seg { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .seg button { background: var(--surface); color: var(--muted); border-color: var(--line); padding: 3px 9px; font-size: 12.5px; }
+  .seg button.on { background: var(--pine); border-color: var(--pine); color: #fff; }
+  .chart { position: relative; height: 230px; margin: 14px 0 6px; padding-left: 38px; }
+  .chart .grid-line { position: absolute; left: 38px; right: 0; border-top: 1px solid var(--line-soft); }
+  .chart .grid-line span { position: absolute; left: -38px; top: -8px; width: 30px; text-align: right; font: 11px "IBM Plex Mono", monospace; color: var(--muted); }
+  .chart .baseline { position: absolute; left: 38px; right: 0; bottom: 24px; border-top: 1px solid var(--muted); }
+  .chart .bars { position: absolute; left: 38px; right: 0; top: 0; bottom: 24px; display: flex; align-items: flex-end; justify-content: space-around; }
+  .chart .col { position: relative; width: 18%; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; cursor: default; }
+  .chart .bar { width: 100%; max-width: 72px; background: #2E8B6A; border-radius: 4px 4px 0 0; }
+  .chart .col:hover .bar, .chart .col:focus .bar { filter: brightness(1.12); }
+  .chart .val { font: 500 12px "IBM Plex Mono", monospace; color: var(--ink); margin-bottom: 4px; }
+  .chart .xl { position: absolute; bottom: -22px; font-size: 12px; color: var(--muted); }
+  .tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 12px; padding: 6px 9px; border-radius: 6px; white-space: nowrap; display: none; z-index: 3; }
+  .tip b { font-family: "IBM Plex Mono", monospace; }
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .demo, header, .tourbox, .toast, .cta, .noprint, nav { display: none !important; }
+    main { padding: 0; max-width: none; }
+    .card, .faq { break-inside: avoid; }
+    .hero h1 { font-size: 26px; }
+    .faq { padding: 8px 0; } .faq b { font-size: 15px; }
+    .printfoot { display: block !important; }
+  }
+  .printfoot { display: none; margin-top: 14px; font-size: 11px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 6px; }
+  @media (max-width: 640px) {
+    .bar { flex-wrap: wrap; gap: 6px 10px; padding: 8px 14px; }
+    nav { order: 3; width: 100%; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    main { padding: 18px 14px 50px; }
+    h1 { font-size: 25px; } .hero h1 { font-size: 27px; }
+    .kiosk select { min-width: 0 !important; width: 100%; }
+    .opts label { padding: 6px 12px; }
+    table.list { display: block; overflow-x: auto; }
+    .chart { padding-left: 30px; }
+  }
+  @media (max-width: 900px) { .hero, .settings-grid { grid-template-columns: 1fr; } .tourbox { left: 12px; right: 12px; width: auto; } }
+  @media (max-width: 900px) { .split, .split.inbox-split, .g2, .g3, .g4, .g5, .steps { grid-template-columns: 1fr; } .drawer { position: static; } }
+</style>
+</head>
+<body>
+<div class="demo">Demo with fictional students and practices. Nothing typed here leaves this page. <a href="#" onclick="resetDemo();return false">Reset demo</a></div>
+<header><div class="bar">
+  <div class="logo">Snowpine <span>Schools</span></div>
+  <nav id="nav"></nav>
+  <div class="spacer"></div>
+  <button class="small" onclick="startTour(0)">▶ Tour</button>
+</div></header>
+
+<main>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="view" id="v-overview">
+  <h1>Mental health screening for high schools, and a ready intake for the psychiatrist.</h1>
+  <p class="lede">Schools run depression and anxiety screening and collect teacher ADHD ratings and IEP, 504, and testing records in one place, for free. Families who want care choose a child and adolescent psychiatrist, who receives the packet already organized.</p>
+  <div class="cta" style="margin:-6px 0 6px"><button onclick="startTour(0)">▶ Take the 3-minute tour</button><button class="ghost" onclick="go('counselors')">For counselors</button><button class="ghost" onclick="go('practices')">For psychiatry practices</button></div>
+
+  <div class="steps" id="steps"></div>
+
+  <div class="grid g2">
+    <div class="card">
+      <div class="label">Who pays</div>
+      <table class="money" style="width:100%;border-collapse:collapse;margin-top:6px">
+        <tr><td><b>School</b></td><td>Free. Screening, teacher forms, records, and safety alerts.</td></tr>
+        <tr><td><b>Family</b></td><td>Free. They see the result in plain words and decide whether to share it and with whom.</td></tr>
+        <tr><td><b>Psychiatry practice</b></td><td>A flat monthly listing in the family directory, plus the Snowpine suite (Letters, Superbills, Private model). <b>No fee per referral, and the directory is not ranked by payment.</b></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="label">Why not sell leads per student</div>
+      <ul class="checklist" style="padding-left:18px;margin:8px 0 0">
+        <li><b>FERPA:</b> a school cannot release a student's results without parent consent.</li>
+        <li><b>HIPAA:</b> once a practice holds the data, selling it is prohibited.</li>
+        <li><b>State referral laws:</b> paying per patient referred is barred in many states, including California under B&amp;P §650.</li>
+        <li>Letting the family choose gets the same students to practices, in a form a district can approve.</li>
+        <li>The directory also lists county, community, and school-based options for free, so counselors can trust it.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="label">Before a pilot school</div>
+    <ul class="checklist" style="padding-left:18px;margin:8px 0 0">
+      <li>Prior written parent consent for screening (PPRA). The counselor screen tracks it per student.</li>
+      <li>A named person at the school who answers same-day safety alerts, and a written protocol.</li>
+      <li>A BAA-covered model endpoint, and a FERPA data agreement with the district.</li>
+      <li>A license for the Vanderbilt teacher scale, or a switch to an open scale. PHQ-A and GAD-7 are free to use.</li>
+      <li>Healthcare counsel to review the listing model before any practice pays.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ FOR COUNSELORS ============ -->
+<section class="view" id="v-counselors">
+  <div class="hero">
+    <div>
+      <div class="label">For school counselors</div>
+      <h1 style="margin:6px 0 10px">Screen every consented student without adding to your caseload.</h1>
+      <p class="lede" style="margin:0">Students check in on a Chromebook in 5 minutes. Snowpine scores it, sorts who needs you first, chases parent consent and teacher forms, and gives families a clear next step, including free options. You keep the conversations. We take the paperwork.</p>
+      <div class="cta"><button onclick="startTour(0)">▶ Watch it work (3 min)</button><button class="ghost" onclick="go('counselor')">Open the counselor screen</button><button class="ghost" onclick="window.print()">Print one-pager</button></div>
+    </div>
+    <div class="card">
+      <div class="label">Free for schools</div>
+      <ul class="gets" style="padding-left:18px;margin:8px 0 0">
+        <li><b>Depression and anxiety check-in</b> (PHQ-A, GAD-7), scored for you</li>
+        <li><b>Same-day safety alerts</b> to you and your backup, never a dashboard you have to remember to check</li>
+        <li><b>Parent consent</b> sent by email and text, tracked per student</li>
+        <li><b>Teacher ADHD forms</b> in one click, scored when the teacher hits Done</li>
+        <li><b>IEP, 504, and testing records</b> in one place per student</li>
+        <li><b>A family directory</b> with county, community, school-based, and private options</li>
+      </ul>
+    </div>
+  </div>
+  <h2 style="margin-bottom:6px">What counselors ask first</h2>
+  <div class="faq"><b>A student answers yes to the suicide question at 3:45 on a Friday. Then what?</b>
+    <p>The check-in only opens during the school day and closes at 2:30 pm, so answers arrive while staff are on site. A yes alerts you and your named backup at once. You run the brief ASQ suicide risk screen (free from NIMH), meet the student, and call the parent under your district's protocol. If an alert is still open at the end of the day, it goes to your district's on-call contact. Snowpine never replaces your protocol. It makes sure nobody misses an alert.</p></div>
+  <div class="faq"><b>Is this a way to sell my students to private practices?</b>
+    <p>No. Families see the results first and decide. The directory lists county mental health, community clinics, and your own wellness center for free, sorted by distance and filtered by the family's insurance. Private practices pay a flat listing fee. No one pays per student, and no one can pay for a higher spot.</p></div>
+  <div class="faq"><b>What does this add to my week?</b>
+    <p>Consent requests, reminders, scoring, and teacher follow-ups run on their own. What is left is the follow-up conversations you would want to have anyway, with a list of who needs you first. We will measure the actual hours in the pilot rather than promise a number now.</p></div>
+  <div class="faq"><b>What about privacy?</b>
+    <p>Parents give written consent before any screening, as PPRA requires. Nothing reaches a practice unless a parent signs for it, item by item, and they can withdraw it later. The district signs a FERPA data agreement before the pilot starts.</p></div>
+  <div class="faq"><b>Is screening at school actually recommended?</b>
+    <p>Yes. The US Preventive Services Task Force recommends screening adolescents ages 12 to 18 for depression and children and adolescents ages 8 to 18 for anxiety. <span class="cite">USPSTF, JAMA, October 2022.</span></p></div>
+  <div class="card" style="margin-top:12px;background:var(--pine-soft);border-color:var(--pine)"><b>A pilot looks like</b> one grade for one semester, at no cost to the school, with a check-in call with you every two weeks.</div>
+  <div class="printfoot">Snowpine Schools · snowpinehealth.com</div>
+</section>
+
+<!-- ============ FOR PRACTICES ============ -->
+<section class="view" id="v-practices">
+  <div class="hero">
+    <div>
+      <div class="label">For child and adolescent psychiatrists</div>
+      <h1 style="margin:6px 0 10px">New adolescent patients who arrive with their records already read.</h1>
+      <p class="lede" style="margin:0">Families find you through their high school's screening program and choose to share their records with you. You get the check-in scores, teacher ADHD ratings, and a summary of the IEP, 504, and testing, with every fact tied to its page, before the first visit.</p>
+      <div class="cta"><button onclick="startTour(TOUR.findIndex(t => t.v === 'psych'))">▶ See the practice inbox</button><button class="ghost" onclick="ST.psychTab='settings';go('psych')">See listing controls</button><button class="ghost" onclick="window.print()">Print one-pager</button></div>
+    </div>
+    <div class="card">
+      <div class="label">What you get</div>
+      <ul class="gets" style="padding-left:18px;margin:8px 0 0">
+        <li><b>Referrals that fit:</b> you set ages, conditions, insurance, and a weekly cap</li>
+        <li><b>The packet:</b> scores, teacher ratings, records summary, and a list of what is still missing</li>
+        <li><b>The letter, half written:</b> the IEP or 504 support letter drafts in Snowpine Letters, in your voice</li>
+        <li><b>Superbills</b> from your paper day sheet, for out-of-network families</li>
+        <li><b>One flat monthly fee.</b> No per-referral charge, ever.</li>
+      </ul>
+    </div>
+  </div>
+  <h2 style="margin-bottom:6px">What psychiatrists ask first</h2>
+  <div class="faq"><b>Will I be flooded with referrals I cannot take?</b>
+    <p>No. You set the ages you see, the conditions you treat, the insurance you take, and a weekly cap. When you are full, your listing says so, and families see the next option. Pausing takes one click.</p></div>
+  <div class="faq"><b>If a packet shows a positive suicide screen, am I responsible before I have seen the patient?</b>
+    <p>The school completes a same-day safety check before results ever reach the family, and your packet shows that it was done. You can decline any referral, and the family is sent back to the directory right away. Confirm the details with your own counsel and malpractice carrier. We will put this in writing in the practice agreement.</p></div>
+  <div class="faq"><b>Why not just pay per referral?</b>
+    <p>Paying per patient referred runs into state anti-referral and fee-splitting laws, such as California's B&amp;P §650, and puts your license at risk. A flat listing keeps you clean, and families trust a directory that nobody can buy their way up.</p></div>
+  <div class="faq"><b>What does it cost?</b>
+    <p>One flat monthly listing that includes Snowpine Letters and Superbills. We are setting the price with the first pilot practices.</p></div>
+  <div class="printfoot">Snowpine Schools · snowpinehealth.com</div>
+</section>
+
+<!-- ============ STUDENT ============ -->
+<section class="view" id="v-student">
+  <div class="kiosk">
+    <div id="kiosk-start">
+      <div class="label">Westview High School · Wellness check-in</div>
+      <h1 style="margin:4px 0 6px">How have you been feeling?</h1>
+      <p class="lede">About 5 minutes. There are no right answers. Your school counselor reads this to make sure students who are struggling get support. It is not a test and it does not go on your report card.</p>
+      <div class="card">
+        <label class="muted small-t">Who is checking in? (In a real school, students sign in with their school account.)</label><br>
+        <select id="kiosk-who" style="margin-top:6px;min-width:280px"></select>
+        <div class="muted small-t" id="kiosk-none" style="margin-top:6px"></div>
+      </div>
+      <h3 style="margin:22px 0 4px">Over the last 2 weeks, how often have you been bothered by…</h3>
+      <div id="phq"></div>
+      <h3 style="margin:22px 0 4px">A few more questions</h3>
+      <div id="phqx"></div>
+      <h3 style="margin:22px 0 4px">Over the last 2 weeks, how often have you been bothered by…</h3>
+      <div id="gad"></div>
+      <div style="margin:18px 0"><button onclick="submitScreen()">Finish</button> <span id="kiosk-err" style="color:var(--danger);margin-left:10px"></span></div>
+    </div>
+    <div id="kiosk-done" style="display:none">
+      <div class="card" style="text-align:center;padding:36px">
+        <h1>Thank you.</h1>
+        <p class="lede" style="margin:10px auto">Your answers went to your school counselor. They may check in with you this week. That is normal and it is not a punishment.</p>
+        <button class="ghost" onclick="resetKiosk()">Next student</button>
+      </div>
+    </div>
+    <div class="crisis"><b>Need to talk to someone now?</b> Call or text <b>988</b>, the Suicide &amp; Crisis Lifeline, any time. You can also walk into the counseling office today.</div>
+  </div>
+</section>
+
+<!-- ============ COUNSELOR ============ -->
+<section class="view" id="v-counselor">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+    <h1>Westview High School</h1><span class="muted">Counselor portal · Fall screening</span>
+    <div class="spacer"></div>
+    <button class="ghost small" onclick="go('student')">Open student check-in</button>
+  </div>
+  <div class="filters" id="counselor-tabs" style="margin-top:14px"></div>
+  <div id="c-caseload">
+  <div class="grid g4" style="margin:16px 0" id="kpis"></div>
+  <div id="urgent"></div>
+  <div class="split">
+    <div class="card">
+      <div class="filters" id="filters"></div>
+      <table class="list" id="roster"></table>
+    </div>
+    <div class="card drawer" id="drawer"></div>
+  </div>
+  <div class="card" id="routing" style="margin-top:14px">
+    <div class="label">Safety alert routing · set once by the district</div>
+    <div class="grid g4" style="margin-top:8px">
+      <div><b>Check-in hours</b><div class="muted small-t">School days, 8:00 am to 2:30 pm, so every answer arrives while staff are on site</div></div>
+      <div><b>First alert</b><div class="muted small-t">Ms. Patel, counselor. Text and email, right away</div></div>
+      <div><b>Backup after 15 minutes</b><div class="muted small-t">Dr. Lee, school psychologist</div></div>
+      <div><b>Still open at end of day</b><div class="muted small-t">The district on-call contact. The parent gets the 988 line by text</div></div>
+    </div>
+  </div>
+  </div>
+  <div id="c-report" style="display:none"></div>
+</section>
+
+<!-- ============ TEACHER ============ -->
+<section class="view" id="v-teacher">
+  <div class="label">Link sent by the Westview counseling office</div>
+  <h1 style="margin:4px 0 4px" id="teacher-title">Teacher rating form</h1>
+  <p class="lede" id="teacher-lede"></p>
+  <iframe class="frame" id="teacher-frame" title="Teacher rating form"></iframe>
+</section>
+
+<!-- ============ FAMILY ============ -->
+<section class="view" id="v-family">
+  <div class="letter" id="family"></div>
+</section>
+
+<!-- ============ PSYCHIATRIST ============ -->
+<section class="view" id="v-psych">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+    <h1>Brentwood Child &amp; Adolescent Psychiatry</h1><span class="muted">Snowpine practice inbox</span>
+  </div>
+  <div class="grid g3" style="margin:16px 0" id="practice-kpis"></div>
+  <div class="filters" id="psych-tabs"></div>
+  <div class="split inbox-split" id="psych-referrals">
+    <div class="card" style="padding:0;overflow:hidden"><div style="padding:12px 14px" class="label">New patient referrals</div><div id="inbox"></div></div>
+    <div class="card packet" id="packet"></div>
+  </div>
+  <div class="card" id="psych-settings" style="display:none"></div>
+</section>
+
+</main>
+<div class="toast" id="toast"></div>
+<div class="tourbox" id="tourbox"></div>
+
+<script id="packet-data" type="application/json">{"student": {"name": "Jordan Avery Test", "grade": "10", "school": "Westview High School"}, "documents": [{"text": "Individualized Education Program (Westview Unified School District), dated 09/18/2026", "source": "iep_sample.pdf", "page": 1, "quote": "IEP meeting date: 09/18/2026"}, {"text": "Section 504 Accommodation Plan (Cedar Ridge Middle School), dated 10/02/2024", "source": "504_sample.pdf", "page": 1, "quote": "Plan date: 10/02/2024"}, {"text": "Neuropsychological Evaluation Summary (Dana Okafor, PhD), dated 05/04/2026 and 05/11/2026", "source": "neuropsych_sample.pdf", "page": 1, "quote": "Dates of testing: 05/04/2026 and"}], "key_dates": [{"text": "IEP meeting date: 09/18/2026", "source": "iep_sample.pdf", "page": 1, "quote": "IEP meeting date: 09/18/2026"}, {"text": "Next annual IEP review: 09/17/2027", "source": "iep_sample.pdf", "page": 1, "quote": "Next annual review: 09/17/2027"}, {"text": "Triennial reevaluation due: 09/2028", "source": "iep_sample.pdf", "page": 1, "quote": "Triennial reevaluation due: 09/2028"}, {"text": "Neuropsychological testing: 05/04/2026 and 05/11/2026", "source": "neuropsych_sample.pdf", "page": 1, "quote": "Dates of testing: 05/04/2026 and"}, {"text": "Prior 504 plan date: 10/02/2024 (superseded by IEP)", "source": "504_sample.pdf", "page": 1, "quote": "Plan date: 10/02/2024"}], "eligibility": [{"text": "IEP primary eligibility: Other Health Impairment (OHI), based on outside ADHD diagnosis", "source": "iep_sample.pdf", "page": 1, "quote": "Primary eligibility: Other Health Impairment (OHI)."}, {"text": "IEP secondary eligibility: Specific Learning Disability (SLD) in written expression", "source": "iep_sample.pdf", "page": 1, "quote": "Secondary eligibility: Specific Learning Disability"}, {"text": "Prior 504 qualifying condition: ADHD limiting concentrating and learning (superseded by IEP)", "source": "504_sample.pdf", "page": 1, "quote": "Qualifying condition: ADHD, substantially limiting the major life activities of concentrating and learning."}], "diagnoses": [{"text": "Attention-Deficit/Hyperactivity Disorder, combined presentation, diagnosed by the family's pediatrician (cited as basis for OHI)", "source": "iep_sample.pdf", "page": 1, "quote": "outside diagnosis of Attention-Deficit/Hyperactivity Disorder, combined presentation,"}, {"text": "Attention-Deficit/Hyperactivity Disorder, combined presentation, diagnosed by Dana Okafor, PhD (neuropsychological evaluation)", "source": "neuropsych_sample.pdf", "page": 2, "quote": "1. Attention-Deficit/Hyperactivity Disorder, combined presentation."}, {"text": "Specific learning disorder with impairment in written expression, diagnosed by Dana Okafor, PhD", "source": "neuropsych_sample.pdf", "page": 2, "quote": "2. Specific learning disorder with"}, {"text": "Rule out generalized anxiety disorder, per Dana Okafor, PhD (provisional, needs follow-up)", "source": "neuropsych_sample.pdf", "page": 2, "quote": "3. Rule out generalized anxiety disorder; parent and self-report"}], "scores": [{"test": "WISC-V", "measure": "Full Scale IQ (FSIQ)", "score": "104", "percentile": "61", "source": "neuropsych_sample.pdf", "page": 1, "quote": "Full Scale IQ (FSIQ) 104 61"}, {"test": "WISC-V", "measure": "Verbal Comprehension (VCI)", "score": "112", "percentile": "79", "source": "neuropsych_sample.pdf", "page": 1, "quote": "Verbal Comprehension (VCI) 112 79"}, {"test": "WISC-V", "measure": "Working Memory (WMI)", "score": "86", "percentile": "18", "source": "neuropsych_sample.pdf", "page": 1, "quote": "Working Memory (WMI) 86 18"}, {"test": "WISC-V", "measure": "Processing Speed (PSI)", "score": "79", "percentile": "8", "source": "neuropsych_sample.pdf", "page": 1, "quote": "Processing Speed (PSI) 79 8"}, {"test": "WIAT-4", "measure": "Written Expression", "score": "81", "percentile": "", "source": "neuropsych_sample.pdf", "page": 2, "quote": "Written Expression 81"}, {"test": "WIAT-4", "measure": "Reading Comprehension", "score": "101", "percentile": "", "source": "neuropsych_sample.pdf", "page": 2, "quote": "Reading Comprehension 101"}, {"test": "WIAT-4", "measure": "Math Problem Solving", "score": "97", "percentile": "", "source": "neuropsych_sample.pdf", "page": 2, "quote": "Math Problem Solving 97"}], "services": [{"text": "Specialized academic instruction (writing): 150 minutes weekly, resource room", "source": "iep_sample.pdf", "page": 2, "quote": "Specialized academic instruction (writing) 150 minutes weekly Resource room"}, {"text": "School counseling: 30 minutes monthly, counseling office", "source": "iep_sample.pdf", "page": 2, "quote": "School counseling 30 minutes monthly Counseling office"}], "accommodations": [{"text": "IEP: Extended time (time and a half) on tests and written assignments", "source": "iep_sample.pdf", "page": 2, "quote": "Extended time (time and a half) on tests and written assignments."}, {"text": "IEP: Preferential seating near instruction", "source": "iep_sample.pdf", "page": 2, "quote": "Preferential seating near instruction."}, {"text": "IEP: Chunked assignments with check-ins", "source": "iep_sample.pdf", "page": 2, "quote": "Chunked assignments with check-ins."}, {"text": "IEP: Access to word processor for writing tasks", "source": "iep_sample.pdf", "page": 2, "quote": "Access to word processor for writing tasks."}, {"text": "Prior 504 (superseded): preferential seating, movement breaks every 30 minutes, teacher-initiated homework reminders", "source": "504_sample.pdf", "page": 1, "quote": "preferential seating; movement breaks every 30 minutes; teacher-initiated reminders"}], "concerns": [{"text": "Teacher (Ms. Rivera, English 10): Jordan completes about half of independent writing assignments", "source": "iep_sample.pdf", "page": 2, "quote": "Jordan completes about half of independent writing"}, {"text": "Teacher (Ms. Rivera, English 10): frequently leaves seat and needs repeated redirection during whole-class instruction", "source": "iep_sample.pdf", "page": 2, "quote": "frequently leaves his seat, and needs repeated redirection during whole-class instruction."}, {"text": "Parent: homework takes over three hours nightly and ends in arguments", "source": "iep_sample.pdf", "page": 2, "quote": "homework takes over three hours nightly and ends in arguments"}, {"text": "Parent: Jordan calls himself 'stupid at school' and has stopped seeing friends on weekends", "source": "iep_sample.pdf", "page": 2, "quote": "'stupid at school' and has stopped seeing friends on weekends."}, {"text": "Neuropsychologist (Dana Okafor, PhD): parent and self-report elevations suggestive of anxiety warrant follow-up", "source": "neuropsych_sample.pdf", "page": 2, "quote": "elevations warrant follow-up."}], "gaps": [{"text": "No teacher ADHD rating scales on file", "why": "The neuropsychologist specifically recommended collecting teacher ADHD rating scales before the psychiatry visit, and none are among the documents, leaving no cross-setting baseline for diagnosis or medication monitoring."}, {"text": "Anxiety and mood not yet assessed", "why": "Generalized anxiety disorder is listed only as rule-out, and the parent reports negative self-talk ('stupid at school') and social withdrawal, but no anxiety or depression screening results are on file."}, {"text": "IEP missing the neuropsych-recommended reduced-distraction testing setting and broader assistive technology", "why": "With Processing Speed at 79 (8th percentile) and Working Memory at 86 (18th percentile), the IEP includes extended time and a word processor but not the reduced-distraction setting or the broader writing assistive technology the evaluator recommended."}, {"text": "Movement breaks dropped from the 504 when the IEP replaced it", "why": "The 2024 504 provided movement breaks every 30 minutes, which do not appear in the current IEP, even though the English teacher reports Jordan frequently leaves his seat."}, {"text": "No medication history or original pediatric ADHD workup on file", "why": "The pediatrician's ADHD diagnosis is cited without a date, supporting rating scales or any record of prior medication trials, all of which are needed for the requested medication evaluation."}], "suggested_letter": {"type": "IEP accommodation support letter", "why": "A psychiatrist letter citing the ADHD diagnosis and the low processing speed and working memory scores could ask the IEP team to add the reduced-distraction testing setting, writing assistive technology and movement breaks that are missing from the current plan. The letter could also ask teachers to complete ADHD rating scales, which would support medication monitoring."}}</script>
+<script id="teacher-form" type="application/json">"\u003c!doctype html>\n\u003chtml lang=\"en\">\n\u003chead>\n\u003cmeta charset=\"utf-8\">\n\u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\u003ctitle>Teacher ADHD rating form\u003c/title>\n\u003cstyle>\n  :root { --ink:#1d2433; --muted:#5b6475; --line:#d7dde5; --teal:#2c5d63; --soft:#eef6f6; --warn:#7a3e00; --bad:#a33; }\n  * { box-sizing: border-box; }\n  body { font: 15px/1.45 -apple-system, Helvetica, Arial, sans-serif; color: var(--ink); max-width: 860px; margin: 24px auto; padding: 0 16px; }\n  h1 { font-size: 22px; margin: 0 0 4px; }\n  .sub { color: var(--muted); margin-bottom: 18px; }\n  fieldset { border: 1px solid var(--line); border-radius: 8px; margin: 0 0 18px; padding: 12px 14px; }\n  legend { font-weight: 600; color: var(--teal); padding: 0 6px; }\n  .info { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }\n  .info label { display: flex; flex-direction: column; font-size: 13px; color: var(--muted); }\n  .info input, .info select { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); }\n  table { width: 100%; border-collapse: collapse; }\n  th { font-size: 12px; color: var(--muted); font-weight: 500; text-align: center; padding: 4px 2px; position: sticky; top: 0; background: #fff; }\n  th:nth-child(2) { text-align: left; }\n  td { border-top: 1px solid #eef1f5; padding: 5px 2px; vertical-align: middle; }\n  td.n { color: var(--muted); width: 28px; font-size: 13px; }\n  td.r { text-align: center; width: 72px; }\n  td.r input { width: 18px; height: 18px; cursor: pointer; }\n  tr.missing td { background: #fdecec; }\n  .group td { background: #f6f8fa; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }\n  button { font: inherit; background: var(--teal); color: #fff; border: 0; border-radius: 6px; padding: 10px 22px; cursor: pointer; }\n  button.secondary { background: #fff; color: var(--teal); border: 1px solid var(--teal); }\n  .err { color: var(--bad); margin-left: 12px; }\n  #result { display: none; }\n  .card { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; margin-bottom: 14px; }\n  .flag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 600; }\n  .yes { background: #fdecec; color: var(--bad); }\n  .no { background: #eaf5ec; color: #2c6b3a; }\n  .res-table td { padding: 6px 4px; }\n  .res-table td:first-child { width: 46%; }\n  .note { font-size: 12px; color: var(--muted); }\n  .foot { font-size: 11px; color: var(--muted); margin-top: 22px; border-top: 1px solid var(--line); padding-top: 8px; }\n  @media print {\n    body { margin: 0; font-size: 12px; }\n    #form, .noprint { display: none !important; }\n    #result { display: block !important; }\n    .card { break-inside: avoid; }\n  }\n\u003c/style>\n\u003c/head>\n\u003cbody>\n\n\u003cdiv id=\"form\">\n  \u003ch1>Teacher ADHD rating form\u003c/h1>\n  \u003cdiv class=\"sub\">About 10 minutes. Base your answers on what you have seen in your classroom. Nothing you enter leaves this page.\u003c/div>\n\n  \u003cfieldset>\n    \u003clegend>About the student\u003c/legend>\n    \u003cdiv class=\"info\">\n      \u003clabel>Student name\u003cinput id=\"student\" autocomplete=\"off\">\u003c/label>\n      \u003clabel>Grade\u003cinput id=\"grade\" autocomplete=\"off\">\u003c/label>\n      \u003clabel>Your name\u003cinput id=\"teacher\" autocomplete=\"off\">\u003c/label>\n      \u003clabel>Class or subject\u003cinput id=\"subject\" autocomplete=\"off\">\u003c/label>\n      \u003clabel>How long have you taught this student?\u003cinput id=\"known\" placeholder=\"e.g. since August\" autocomplete=\"off\">\u003c/label>\n      \u003clabel>Today's date\u003cinput id=\"date\" type=\"date\">\u003c/label>\n      \u003clabel>Were your observations made while the student was\n        \u003cselect id=\"meds\">\u003coption value=\"\">Choose one\u003c/option>\u003coption>on medication\u003c/option>\u003coption>not on medication\u003c/option>\u003coption>not sure\u003c/option>\u003c/select>\n      \u003c/label>\n    \u003c/div>\n  \u003c/fieldset>\n\n  \u003cfieldset>\n    \u003clegend>Behavior in the past few weeks\u003c/legend>\n    \u003ctable id=\"symptoms\">\u003c/table>\n  \u003c/fieldset>\n\n  \u003cfieldset>\n    \u003clegend>Performance\u003c/legend>\n    \u003ctable id=\"performance\">\u003c/table>\n  \u003c/fieldset>\n\n  \u003cbutton id=\"done\">Done\u003c/button>\u003cspan class=\"err\" id=\"err\">\u003c/span>\n\u003c/div>\n\n\u003cdiv id=\"result\">\n  \u003cdiv class=\"noprint\" style=\"margin-bottom:14px\">\n    \u003cbutton onclick=\"window.print()\">Print or save as PDF\u003c/button>\n    \u003cbutton class=\"secondary\" onclick=\"backToForm()\">Edit answers\u003c/button>\n  \u003c/div>\n  \u003cdiv id=\"report\">\u003c/div>\n\u003c/div>\n\n\u003cdiv class=\"foot\">Items from the NICHQ Vanderbilt Assessment Scale, Teacher Informant. Copyright American Academy of Pediatrics and NICHQ. Snowpine internal prototype, not licensed for commercial use. A screening result is not a diagnosis.\u003c/div>\n\n\u003cscript>\nconst SYMPTOMS = [\n  // Inattentive 1-9\n  \"Fails to give attention to details or makes careless mistakes in schoolwork\",\n  \"Has difficulty sustaining attention to tasks or activities\",\n  \"Does not seem to listen when spoken to directly\",\n  \"Does not follow through on instructions and fails to finish schoolwork (not due to oppositional behavior or failure to understand)\",\n  \"Has difficulty organizing tasks and activities\",\n  \"Avoids, dislikes, or is reluctant to engage in tasks that require sustained mental effort\",\n  \"Loses things necessary for tasks or activities (school assignments, pencils, or books)\",\n  \"Is easily distracted by extraneous stimuli\",\n  \"Is forgetful in daily activities\",\n  // Hyperactive/impulsive 10-18\n  \"Fidgets with hands or feet or squirms in seat\",\n  \"Leaves seat in classroom or in other situations in which remaining seated is expected\",\n  \"Runs about or climbs excessively in situations in which remaining seated is expected\",\n  \"Has difficulty playing or engaging in leisure activities quietly\",\n  \"Is \u201con the go\u201d or often acts as if \u201cdriven by a motor\u201d\",\n  \"Talks excessively\",\n  \"Blurts out answers before questions have been completed\",\n  \"Has difficulty waiting in line\",\n  \"Interrupts or intrudes on others (e.g., butts into conversations or games)\",\n  // Oppositional/conduct 19-28\n  \"Loses temper\",\n  \"Actively defies or refuses to comply with adults\u2019 requests or rules\",\n  \"Is angry or resentful\",\n  \"Is spiteful and vindictive\",\n  \"Bullies, threatens, or intimidates others\",\n  \"Initiates physical fights\",\n  \"Lies to obtain goods for favors or to avoid obligations (e.g., \u201ccons\u201d others)\",\n  \"Is physically cruel to people\",\n  \"Has stolen items of nontrivial value\",\n  \"Deliberately destroys others\u2019 property\",\n  // Anxiety/depression 29-35\n  \"Is fearful, anxious, or worried\",\n  \"Is self-conscious or easily embarrassed\",\n  \"Is afraid to try new things for fear of making mistakes\",\n  \"Feels worthless or inferior\",\n  \"Blames self for problems; feels guilty\",\n  \"Feels lonely, unwanted, or unloved; complains that \u201cno one loves him or her\u201d\",\n  \"Is sad, unhappy, or depressed\",\n];\nconst SYM_GROUPS = { 1: \"Attention\", 10: \"Activity and impulse control\", 19: \"Mood and conduct\", 29: \"Worry and sadness\" };\nconst SYM_SCALE = [\"Never\", \"Occasionally\", \"Often\", \"Very often\"];   // scored 0-3\n\nconst PERF = [\n  [\"Academic\", \"Reading\"], [\"Academic\", \"Mathematics\"], [\"Academic\", \"Written expression\"],\n  [\"Classroom behavior\", \"Relationship with peers\"], [\"Classroom behavior\", \"Following directions\"],\n  [\"Classroom behavior\", \"Disrupting class\"], [\"Classroom behavior\", \"Assignment completion\"],\n  [\"Classroom behavior\", \"Organizational skills\"],\n];\nconst PERF_SCALE = [\"Excellent\", \"Above average\", \"Average\", \"Somewhat of a problem\", \"Problematic\"]; // scored 1-5\n\nfunction buildTable(id, items, scale, start, groupFor) {\n  const t = document.getElementById(id);\n  let h = \"\u003ctr>\u003cth>\u003c/th>\u003cth>\u003c/th>\" + scale.map(s => `\u003cth>${s}\u003c/th>`).join(\"\") + \"\u003c/tr>\";\n  items.forEach((text, i) => {\n    const n = start + i, g = groupFor(n, i);\n    if (g) h += `\u003ctr class=\"group\">\u003ctd>\u003c/td>\u003ctd colspan=\"${scale.length + 1}\">${g}\u003c/td>\u003c/tr>`;\n    h += `\u003ctr id=\"row${n}\">\u003ctd class=\"n\">${n}\u003c/td>\u003ctd>${text}\u003c/td>` +\n      scale.map((_, v) => `\u003ctd class=\"r\">\u003cinput type=\"radio\" name=\"q${n}\" value=\"${v}\" aria-label=\"${scale[v]}\">\u003c/td>`).join(\"\") + \"\u003c/tr>\";\n  });\n  t.innerHTML = h;\n}\nbuildTable(\"symptoms\", SYMPTOMS, SYM_SCALE, 1, n => SYM_GROUPS[n]);\nbuildTable(\"performance\", PERF.map(p => p[1]), PERF_SCALE, 36, (n, i) => i === 0 || PERF[i][0] !== PERF[i - 1][0] ? PERF[i][0] : null);\ndocument.getElementById(\"date\").valueAsDate = new Date();\n\nconst val = n => { const r = document.querySelector(`input[name=q${n}]:checked`); return r ? +r.value : null; };\nconst range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);\nconst esc = s => String(s).replace(/[&\u003c>\"]/g, c => ({ \"&\": \"&amp;\", \"\u003c\": \"&lt;\", \">\": \"&gt;\", '\"': \"&quot;\" }[c]));\n\nfunction score() {\n  const s = {};\n  range(1, 43).forEach(n => s[n] = val(n));\n  const sym = n => s[n];                      // 0-3\n  const perf = n => s[n] + 1;                 // stored 0-4, scored 1-5\n  const positive = ns => ns.filter(n => sym(n) >= 2);\n  const inatt = positive(range(1, 9)), hyper = positive(range(10, 18));\n  const odd = positive(range(19, 28)), anx = positive(range(29, 35));\n  const impaired = range(36, 43).filter(n => perf(n) >= 4);\n  const impairment = impaired.length > 0;\n  return {\n    inatt, hyper, odd, anx, impaired, impairment,\n    totalSymptom: range(1, 18).reduce((a, n) => a + sym(n), 0),\n    avgPerf: (range(36, 43).reduce((a, n) => a + perf(n), 0) / 8).toFixed(1),\n    criteria: {\n      inattentive: inatt.length >= 6,\n      hyperactive: hyper.length >= 6,\n      oddcd: odd.length >= 3,\n      anxdep: anx.length >= 3,\n    },\n    s, perf,\n  };\n}\n\nfunction flag(on) { return `\u003cspan class=\"flag ${on ? \"yes\" : \"no\"}\">${on ? \"Meets screen\" : \"Below threshold\"}\u003c/span>`; }\nfunction itemList(ns) { return ns.length ? ns.map(n => n \u003c= 35 ? SYMPTOMS[n - 1] : PERF[n - 36][1]).map(esc).join(\"; \") : \"none\"; }\n\nfunction render(r) {\n  const f = id => esc(document.getElementById(id).value || \"not given\");\n  const c = r.criteria;\n  let presentation = \"Does not meet ADHD symptom criteria\";\n  if (c.inattentive && c.hyperactive) presentation = \"Combined presentation\";\n  else if (c.inattentive) presentation = \"Predominantly inattentive presentation\";\n  else if (c.hyperactive) presentation = \"Predominantly hyperactive/impulsive presentation\";\n  const adhdSymptoms = c.inattentive || c.hyperactive;\n\n  document.getElementById(\"report\").innerHTML = `\n    \u003ch1>Teacher rating: ${f(\"student\")}\u003c/h1>\n    \u003cdiv class=\"sub\">Grade ${f(\"grade\")} \u00b7 ${f(\"teacher\")}, ${f(\"subject\")} \u00b7 taught ${f(\"known\")} \u00b7 rated ${f(\"date\")} \u00b7 observed ${f(\"meds\")}\u003c/div>\n\n    \u003cdiv class=\"card\">\n      \u003cb>ADHD screen: ${presentation}${adhdSymptoms ? (r.impairment ? \", with classroom impairment\" : \", but no classroom impairment reported\") : \"\"}\u003c/b>\n      \u003cdiv class=\"note\">ADHD screen is positive only when symptom criteria are met \u003ci>and\u003c/i> at least one performance item is rated 4 or 5.\u003c/div>\n    \u003c/div>\n\n    \u003cdiv class=\"card\">\n      \u003ctable class=\"res-table\">\n        \u003ctr>\u003ctd>Inattention (items 1 to 9)\u003c/td>\u003ctd>${r.inatt.length} of 9 rated often or very often\u003c/td>\u003ctd>${flag(c.inattentive)}\u003c/td>\u003c/tr>\n        \u003ctr>\u003ctd>Hyperactivity/impulsivity (items 10 to 18)\u003c/td>\u003ctd>${r.hyper.length} of 9\u003c/td>\u003ctd>${flag(c.hyperactive)}\u003c/td>\u003c/tr>\n        \u003ctr>\u003ctd>Oppositional/conduct (items 19 to 28)\u003c/td>\u003ctd>${r.odd.length} of 10\u003c/td>\u003ctd>${flag(c.oddcd)}\u003c/td>\u003c/tr>\n        \u003ctr>\u003ctd>Anxiety/depression (items 29 to 35)\u003c/td>\u003ctd>${r.anx.length} of 7\u003c/td>\u003ctd>${flag(c.anxdep)}\u003c/td>\u003c/tr>\n        \u003ctr>\u003ctd>Classroom impairment (items 36 to 43)\u003c/td>\u003ctd>${r.impaired.length} of 8 rated 4 or 5\u003c/td>\u003ctd>${flag(r.impairment)}\u003c/td>\u003c/tr>\n      \u003c/table>\n      \u003cdiv class=\"note\" style=\"margin-top:6px\">Total ADHD symptom score (items 1 to 18): ${r.totalSymptom} of 54 \u00b7 Average performance score: ${r.avgPerf} of 5. Track both across repeat ratings.\u003c/div>\n    \u003c/div>\n\n    \u003cdiv class=\"card\">\n      \u003cdiv>\u003cb>Rated often or very often.\u003c/b> Attention: ${itemList(r.inatt)}.\u003c/div>\n      \u003cdiv style=\"margin-top:4px\">Activity and impulse: ${itemList(r.hyper)}.\u003c/div>\n      ${r.odd.length ? `\u003cdiv style=\"margin-top:4px\">Mood and conduct: ${itemList(r.odd)}.\u003c/div>` : \"\"}\n      ${r.anx.length ? `\u003cdiv style=\"margin-top:4px\">Worry and sadness: ${itemList(r.anx)}.\u003c/div>` : \"\"}\n      \u003cdiv style=\"margin-top:4px\">\u003cb>Performance problems:\u003c/b> ${itemList(r.impaired)}.\u003c/div>\n    \u003c/div>\n    ${r.anx.length ? `\u003cdiv class=\"card\" style=\"border-color:#f0b55a\">\u003cb>Note for the clinician:\u003c/b> the teacher endorsed ${r.anx.length} anxiety or mood item(s). Review them whatever the ADHD result.\u003c/div>` : \"\"}\n  `;\n}\n\ndocument.getElementById(\"done\").onclick = () => {\n  const missing = range(1, 43).filter(n => val(n) === null);\n  document.querySelectorAll(\"tr.missing\").forEach(tr => tr.classList.remove(\"missing\"));\n  missing.forEach(n => document.getElementById(\"row\" + n).classList.add(\"missing\"));\n  const err = document.getElementById(\"err\");\n  if (missing.length) {\n    err.textContent = `${missing.length} question(s) still need an answer. They are highlighted.`;\n    document.getElementById(\"row\" + missing[0]).scrollIntoView({ block: \"center\", behavior: \"smooth\" });\n    return;\n  }\n  err.textContent = \"\";\n  render(score());\n  document.getElementById(\"form\").style.display = \"none\";\n  document.getElementById(\"result\").style.display = \"block\";\n  window.scrollTo(0, 0);\n};\n\nfunction backToForm() {\n  document.getElementById(\"result\").style.display = \"none\";\n  document.getElementById(\"form\").style.display = \"block\";\n}\n\u003c/script>\n\u003c/body>\n\u003c/html>\n"</script>
+<script>
+/* ---------------- instruments ---------------- */
+const FREQ = ["Not at all", "Several days", "More than half the days", "Nearly every day"];
+const PHQ = [  // PHQ-A (PHQ-9 modified for adolescents)
+  "Feeling down, depressed, irritable, or hopeless?",
+  "Little interest or pleasure in doing things?",
+  "Trouble falling asleep, staying asleep, or sleeping too much?",
+  "Poor appetite, weight loss, or overeating?",
+  "Feeling tired, or having little energy?",
+  "Feeling bad about yourself, or feeling that you are a failure, or that you have let yourself or your family down?",
+  "Trouble concentrating on things like school work, reading, or watching TV?",
+  "Moving or speaking so slowly that other people could have noticed? Or the opposite: being so fidgety or restless that you were moving around a lot more than usual?",
+  "Thoughts that you would be better off dead, or of hurting yourself in some way?",
+];
+const PHQX = [
+  ["year", "In the past year, have you felt depressed or sad most days, even if you felt okay sometimes?"],
+  ["month", "Has there been a time in the past month when you have had serious thoughts about ending your life?"],
+  ["ever", "Have you ever, in your whole life, tried to kill yourself or made a suicide attempt?"],
+];
+const GAD = [
+  "Feeling nervous, anxious, or on edge",
+  "Not being able to stop or control worrying",
+  "Worrying too much about different things",
+  "Trouble relaxing",
+  "Being so restless that it is hard to sit still",
+  "Becoming easily annoyed or irritable",
+  "Feeling afraid, as if something awful might happen",
+];
+const phqBand = s => s == null ? null : s >= 20 ? "Severe" : s >= 15 ? "Moderately severe" : s >= 10 ? "Moderate" : s >= 5 ? "Mild" : "Minimal";
+const gadBand = s => s == null ? null : s >= 15 ? "Severe" : s >= 10 ? "Moderate" : s >= 5 ? "Mild" : "Minimal";
+const bandClass = b => !b ? "c-none" : /Severe/.test(b) ? "c-bad" : b === "Moderate" ? "c-warn" : b === "Mild" ? "c-info" : "c-ok";
+const FOLLOW = ["Not started", "Met with student", "Parent contacted", "Referred to care", "Closed"];
+const isUrgent = s => s.screened && (s.item9 > 0 || s.month || s.ever);
+const needsFollow = s => s.screened && (s.phq >= 10 || s.gad >= 10 || isUrgent(s) || (s.teacher && s.teacher.adhd));
+
+/* ---------------- demo data ---------------- */
+const PACKET = JSON.parse(document.getElementById("packet-data").textContent);
+function seed() {
+  const S = (id, name, grade, consent, phq, gad, extra = {}) => Object.assign({
+    id, name, grade, consent, screened: phq != null, phq, gad, item9: 0, month: false, ever: false,
+    teacher: null, docs: [], family: "none", practice: null, safetyDone: false, follow: 0, consentAsked: consent === "pending" ? 1 : 0,
+  }, extra);
+  return {
+    students: [
+      S("jordan", "Jordan Avery Test", 10, "yes", 11, 12, {
+        teacher: { sent: ["Ms. Rivera (English 10)", "Mr. Okoye (Biology)"], done: [] },
+        docs: ["iep_sample.pdf", "504_sample.pdf", "neuropsych_sample.pdf"], digest: true, family: "sent" }),
+      S("diego", "Diego Ramos", 11, "yes", 16, 9, { item9: 1 }),
+      S("maya", "Maya Lin", 9, "yes", 7, 13),
+      S("priya", "Priya Shah", 12, "yes", 3, 4),
+      S("ethan", "Ethan Cole", 9, "yes", 12, 6, { teacher: { sent: ["Ms. Grant (Algebra I)"], done: [{ by: "Ms. Grant (Algebra I)", inatt: 7, hyper: 6, impair: 3 }], adhd: true } }),
+      S("aaliyah", "Aaliyah Brooks", 10, "yes", 5, 8),
+      S("noah", "Noah Kim", 11, "pending", null, null),
+      S("sofia", "Sofia Alvarez", 12, "yes", 2, 3),
+      S("liam", "Liam O'Connor", 10, "yes", null, null),
+      S("zara", "Zara Ahmed", 9, "yes", null, null),
+      S("marcus", "Marcus Hill", 11, "declined", null, null),
+      S("hannah", "Hannah Weiss", 12, "yes", 9, 15),
+      S("owen", "Owen Park", 10, "pending", null, null),
+      S("isabel", "Isabel Cruz", 9, "yes", 4, 2),
+    ],
+    practices: [
+      { id: "wellness", name: "Westview High Wellness Center", kind: "Therapy", miles: 0, ins: ["Any"], cost: "Free for Westview students", tele: false, next: "This week", listing: "School program", free: true, meds: false },
+      { id: "clinic", name: "Westview Community Clinic", kind: "Therapy and psychiatry", miles: 1.8, ins: ["Medi-Cal", "No insurance", "Blue Shield"], cost: "Sliding scale, can be $0", tele: true, next: "2 to 3 weeks", listing: "Nonprofit", free: true, meds: true },
+      { id: "brentwood", name: "Brentwood Child & Adolescent Psychiatry", kind: "Psychiatry", miles: 3.1, ins: ["Out of network"], cost: "Out of network, superbill provided", tele: true, next: "Within 2 weeks", listing: "Practice", free: false, meds: true },
+      { id: "county", name: "County Mental Health, Youth Services", kind: "Therapy and psychiatry", miles: 4.2, ins: ["Medi-Cal", "No insurance"], cost: "No cost with Medi-Cal or no insurance", tele: true, next: "Intake call within 1 week", listing: "Public", free: true, meds: true },
+      { id: "westside", name: "Westside Youth Mental Health", kind: "Psychiatry and therapy", miles: 5.4, ins: ["Aetna", "Blue Shield", "Cigna"], cost: "In network for listed plans", tele: true, next: "4 to 6 weeks", listing: "Practice", free: false, meds: true },
+      { id: "valley", name: "Valley Teen Psychiatry Group", kind: "Psychiatry", miles: 8.9, ins: ["Medi-Cal", "Kaiser"], cost: "In network for listed plans", tele: false, next: "6 to 8 weeks", listing: "Practice", free: false, meds: true },
+    ],
+    settings: { accepting: true, ageMin: 12, ageMax: 18, cap: 5, thisWeek: 2,
+      conditions: { depression: true, anxiety: true, adhd: true, eating: false, substance: false, psychosis: false },
+      ins: ["Out of network"] },
+    famIns: "", dirFilter: "all", psychTab: "referrals", declining: null, counselorTab: "caseload",
+    referrals: [  // already in Brentwood's inbox
+      { id: "r-ana", name: "Ana Torres", grade: 11, school: "Palisades Charter High", when: "Oct 9", phq: 14, gad: 11, teacher: null, docs: false, scope: ["screen"], status: "Appointment offered" },
+      { id: "r-ben", name: "Ben Hollis", grade: 9, school: "Westview High School", when: "Oct 10", phq: 6, gad: 7, teacher: { inatt: 8, hyper: 2, impair: 2 }, docs: false, scope: ["screen", "teacher"], status: "New" },
+    ],
+    familyFor: "jordan", picked: null, selected: "jordan", filter: "all", openRef: null,
+  };
+}
+let ST = seed();
+const stu = id => ST.students.find(s => s.id === id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 2600); }
+function resetDemo() { endTour(); ST = seed(); teacherLoaded = null; renderAll(); go("overview"); toast("Demo reset"); }
+
+/* ---------------- nav ---------------- */
+const VIEWS = [
+  ["overview", "", "How it works"],
+  ["counselors", "", "Counselors"],
+  ["practices", "", "Practices"],
+  ["student", "1", "Student"],
+  ["counselor", "2", "Counselor"],
+  ["teacher", "3", "Teacher"],
+  ["family", "4", "Family"],
+  ["psych", "5", "Psychiatrist"],
+];
+function go(v) {
+  document.querySelectorAll(".view").forEach(x => x.classList.toggle("on", x.id === "v-" + v));
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  if (v === "teacher") loadTeacher();
+  renderAll();
+  window.scrollTo(0, 0);
+  history.replaceState(null, "", "#" + v);
+}
+document.getElementById("nav").innerHTML = VIEWS.map(([v, n, l]) => (v === "student" ? `<span class="sep"></span>` : "") + `<button data-v="${v}" onclick="go('${v}')">${n ? `<span class="n">${n}</span>` : ""}${l}</button>`).join("");
+document.getElementById("steps").innerHTML = [
+  ["student", "1 · Student", "Checks in", "A 5-minute PHQ-A and GAD-7 on a school Chromebook, with parent consent on file."],
+  ["counselor", "2 · Counselor", "Triages", "Safety answers alert the counselor right away. Moderate and higher scores are queued for follow-up."],
+  ["teacher", "3 · Teacher", "Rates attention", "One link, 10 minutes, scored on the spot. IEP and 504 files are uploaded once."],
+  ["family", "4 · Family", "Chooses care", "Plain-language results. The family picks a practice and what to share, or nobody."],
+  ["psych", "5 · Psychiatrist", "Gets the packet", "Scores, teacher ratings, and a quote-checked records summary, before the first visit."],
+].map(([v, who, t, d]) => `<div class="step" onclick="go('${v}')"><div class="who">${who}</div><b>${t}</b><div class="muted small-t">${d}</div></div>`).join("");
+
+/* ---------------- student kiosk ---------------- */
+function qBlock(name, text, labels, i) {
+  return `<div class="q" id="q-${name}"><p>${i != null ? `<span class="mono muted">${i}.</span> ` : ""}${esc(text)}</p><div class="opts">` +
+    labels.map((l, v) => `<label><input type="radio" name="${name}" value="${v}"><span>${l}</span></label>`).join("") + "</div></div>";
+}
+document.getElementById("phq").innerHTML = PHQ.map((t, i) => qBlock("phq" + i, t, FREQ, i + 1)).join("");
+document.getElementById("phqx").innerHTML = PHQX.map(([k, t]) => qBlock("x" + k, t, ["No", "Yes"])).join("");
+document.getElementById("gad").innerHTML = GAD.map((t, i) => qBlock("gad" + i, t, FREQ, i + 1)).join("");
+const rv = n => { const r = document.querySelector(`input[name="${n}"]:checked`); return r ? +r.value : null; };
+
+function renderKiosk() {
+  const ready = ST.students.filter(s => s.consent === "yes" && !s.screened);
+  const sel = document.getElementById("kiosk-who");
+  const keep = sel.value;
+  sel.innerHTML = ready.map(s => `<option value="${s.id}">${esc(s.name)} · grade ${s.grade}</option>`).join("");
+  if (ready.some(s => s.id === keep)) sel.value = keep;
+  sel.disabled = !ready.length;
+  const blocked = ST.students.filter(s => s.consent !== "yes").length;
+  document.getElementById("kiosk-none").textContent = ready.length
+    ? `${blocked} student(s) are not listed because a parent has not consented.`
+    : "Every consented student has checked in. Reset the demo to try again.";
+}
+function submitScreen() {
+  const id = document.getElementById("kiosk-who").value;
+  if (!id) return;
+  const names = [...PHQ.map((_, i) => "phq" + i), ...PHQX.map(([k]) => "x" + k), ...GAD.map((_, i) => "gad" + i)];
+  const missing = names.filter(n => rv(n) === null);
+  document.querySelectorAll(".q.missing").forEach(q => q.classList.remove("missing"));
+  missing.forEach(n => document.getElementById("q-" + n).classList.add("missing"));
+  if (missing.length) {
+    document.getElementById("kiosk-err").textContent = `${missing.length} question(s) still need an answer.`;
+    document.getElementById("q-" + missing[0]).scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
+  document.getElementById("kiosk-err").textContent = "";
+  const s = stu(id);
+  Object.assign(s, {
+    screened: true,
+    phq: PHQ.reduce((a, _, i) => a + rv("phq" + i), 0),
+    gad: GAD.reduce((a, _, i) => a + rv("gad" + i), 0),
+    item9: rv("phq8"), month: rv("xmonth") === 1, ever: rv("xever") === 1, year: rv("xyear") === 1,
+    justNow: true,
+  });
+  ST.selected = id;
+  document.getElementById("kiosk-start").style.display = "none";
+  document.getElementById("kiosk-done").style.display = "block";
+  window.scrollTo(0, 0);
+  toast(isUrgent(s) ? `Safety alert sent to the counselor for ${s.name}` : `${s.name}'s check-in saved`);
+}
+function resetKiosk() {
+  document.querySelectorAll("#v-student input[type=radio]").forEach(r => r.checked = false);
+  document.getElementById("kiosk-start").style.display = "block";
+  document.getElementById("kiosk-done").style.display = "none";
+  renderKiosk();
+  window.scrollTo(0, 0);
+}
+
+/* ---------------- counselor ---------------- */
+function adhdChip(s) {
+  const t = s.teacher;
+  if (!t) return `<span class="chip c-none">not requested</span>`;
+  if (!t.done.length) return `<span class="chip c-info">${t.sent.length} sent, 0 back</span>`;
+  return t.adhd ? `<span class="chip c-warn">meets screen (${t.done.length}/${t.sent.length})</span>` : `<span class="chip c-ok">below (${t.done.length}/${t.sent.length})</span>`;
+}
+function scoreChip(score, band) {
+  return score == null ? `<span class="chip c-none">not screened</span>` : `<span class="chip ${bandClass(band)}"><span class="mono">${score}</span> ${band}</span>`;
+}
+const FILTERS = [["all", "All"], ["follow", "Open follow-ups"], ["unscreened", "Not screened"], ["consent", "Awaiting consent"]];
+function renderCounselor() {
+  document.getElementById("counselor-tabs").innerHTML = [["caseload", "Caseload"], ["report", "School report"]].map(([k, l]) =>
+    `<button class="${ST.counselorTab === k ? "on" : ""}" onclick="ST.counselorTab='${k}';renderCounselor()">${l}</button>`).join("");
+  document.getElementById("c-caseload").style.display = ST.counselorTab === "caseload" ? "" : "none";
+  document.getElementById("c-report").style.display = ST.counselorTab === "report" ? "" : "none";
+  if (ST.counselorTab === "report") renderReport();
+  const ss = ST.students;
+  const consented = ss.filter(s => s.consent === "yes").length;
+  const screened = ss.filter(s => s.screened).length;
+  const follow = ss.filter(needsFollow).length;
+  const urgent = ss.filter(s => isUrgent(s) && !s.safetyDone);
+  document.getElementById("kpis").innerHTML = [
+    ["Parent consent", `${consented}<span class="muted" style="font-size:18px"> / ${ss.length}</span>`, `${ss.filter(s => s.consent === "pending").length} pending, ${ss.filter(s => s.consent === "declined").length} declined`],
+    ["Checked in", `${screened}<span class="muted" style="font-size:18px"> / ${consented}</span>`, "consented students"],
+    ["Follow-ups done", `${ss.filter(s => needsFollow(s) && s.follow >= 3).length}<span class="muted" style="font-size:18px"> / ${follow}</span>`, "referred to care or closed"],
+    ["Safety alerts open", urgent.length, urgent.length ? "see the student today" : "none open"],
+  ].map(([l, b, d], i) => `<div class="card" ${i === 3 && urgent.length ? 'style="border-color:#e2b9a7;background:var(--danger-soft)"' : ""}><div class="label">${l}</div><div class="big">${b}</div><div class="muted small-t">${d}</div></div>`).join("");
+
+  document.getElementById("urgent").innerHTML = urgent.length ? `<div class="urgent"><h3>Safety alert: see today</h3>
+    <div class="small-t" style="margin:2px 0 8px">These students answered yes to a question about suicide or self-harm. Next step under your protocol: run the brief ASQ suicide risk screen with the student, then call the parent. Snowpine alerts and keeps the record. The judgment call stays with you.</div>` +
+    urgent.map(s => `<div style="display:flex;gap:10px;align-items:center;margin:4px 0"><b>${esc(s.name)}</b><span class="muted">grade ${s.grade}</span>
+      <span class="small-t">${[s.item9 > 0 ? `item 9 answered "${FREQ[s.item9]}"` : "", s.month ? "serious thoughts in the past month" : "", s.ever ? "past attempt" : ""].filter(Boolean).join(" · ")}</span>
+      <div class="spacer"></div><button class="small ghost" onclick="pick('${s.id}')">Open</button><button class="small" onclick="safetyDone('${s.id}')">Met with student, parent called</button></div>`).join("") + "</div>" : "";
+
+  document.getElementById("filters").innerHTML = FILTERS.map(([k, l]) => `<button class="${ST.filter === k ? "on" : ""}" onclick="ST.filter='${k}';renderCounselor()">${l}</button>`).join("");
+  const shown = ss.filter(s => ST.filter === "all" || (ST.filter === "follow" && needsFollow(s) && s.follow < 3) ||
+    (ST.filter === "unscreened" && s.consent === "yes" && !s.screened) || (ST.filter === "consent" && s.consent !== "yes"));
+  const famChip = s => ({ none: `<span class="chip c-none">not sent</span>`, sent: `<span class="chip c-info">results sent</span>`, shared: `<span class="chip c-ok">chose a practice</span>`, declined: `<span class="chip c-none">declined care</span>` })[s.family];
+  document.getElementById("roster").innerHTML = `<tr><th>Student</th><th>Gr</th><th>Depression (PHQ-A)</th><th>Anxiety (GAD-7)</th><th>ADHD (teachers)</th><th>Family</th></tr>` +
+    shown.map(s => `<tr class="row ${ST.selected === s.id ? "sel" : ""}" onclick="pick('${s.id}')">
+      <td>${isUrgent(s) && !s.safetyDone ? "🔴 " : ""}<b>${esc(s.name)}</b>${s.consent === "pending" ? ` <span class="chip c-warn">consent pending</span>` : s.consent === "declined" ? ` <span class="chip c-none">opted out</span>` : ""}${s.justNow ? ` <span class="chip c-info">new</span>` : ""}${needsFollow(s) ? ` <span class="chip ${s.follow >= 3 ? "c-ok" : s.follow ? "c-info" : "c-warn"}">${FOLLOW[s.follow].toLowerCase()}</span>` : ""}</td>
+      <td class="mono">${s.grade}</td><td>${scoreChip(s.phq, phqBand(s.phq))}</td><td>${scoreChip(s.gad, gadBand(s.gad))}</td><td>${adhdChip(s)}</td><td>${famChip(s)}</td></tr>`).join("") +
+    (shown.length ? "" : `<tr><td colspan="6" class="muted">No students in this view.</td></tr>`);
+  renderDrawer();
+}
+function pick(id) { ST.selected = id; ST.counselorTab = "caseload"; renderCounselor(); }
+const REPORT = {  // simulated, school-wide; the caseload roster above is a sample
+  grades: [
+    { g: 9, enrolled: 480, consented: 372, screened: 358, mod: 57, alerts: 6 },
+    { g: 10, enrolled: 465, consented: 350, screened: 339, mod: 64, alerts: 8 },
+    { g: 11, enrolled: 450, consented: 331, screened: 318, mod: 62, alerts: 7 },
+    { g: 12, enrolled: 445, consented: 309, screened: 290, mod: 49, alerts: 5 },
+  ],
+  alertsSameDay: 26, followDone: 171, referred: 94,
+};
+function renderReport() {
+  const R = REPORT, sum = k => R.grades.reduce((a, g) => a + g[k], 0);
+  const enrolled = sum("enrolled"), consented = sum("consented"), screened = sum("screened"), mod = sum("mod"), alerts = sum("alerts");
+  const pct = (a, b) => Math.round(100 * a / b);
+  const rates = R.grades.map(g => ({ ...g, rate: 100 * g.mod / g.screened }));
+  const top = 25;
+  let h = `<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <h2>Fall screening report</h2><span class="muted small-t">For the principal and the board. No student names. Groups under 10 students are never shown.</span>
+      <div class="spacer"></div><button class="ghost small noprint" onclick="window.print()">Print for the board</button></div>
+    <div class="chip c-warn" style="margin-top:8px">Simulated numbers for an 1,840-student school</div>
+    <div class="grid g5" style="margin:14px 0">` + [
+      ["Parent consent", pct(consented, enrolled) + "%", `${consented.toLocaleString()} of ${enrolled.toLocaleString()} students`],
+      ["Checked in", pct(screened, consented) + "%", `${screened.toLocaleString()} of consented students`],
+      ["Moderate or higher", pct(mod, screened) + "%", `${mod} students, depression or anxiety`],
+      ["Safety alerts", alerts, `${R.alertsSameDay} of ${alerts} seen the same day`],
+      ["Follow-ups done", pct(R.followDone, mod) + "%", `${R.followDone} of ${mod}, ${R.referred} referred to care`],
+    ].map(([l, b, d]) => `<div class="card"><div class="label">${l}</div><div class="big">${b}</div><div class="muted small-t">${d}</div></div>`).join("") + `</div>
+    <div class="grid g2">
+      <div class="card"><b>Students at moderate or higher, by grade</b><div class="muted small-t">Share of students who checked in, PHQ-A or GAD-7 of 10 or more</div>
+        <div class="chart" id="rchart">
+          ${[0, 5, 10, 15, 20, 25].map(v => `<div class="grid-line" style="bottom:calc(24px + (100% - 24px) * ${v / top})"><span>${v}%</span></div>`).join("")}
+          <div class="baseline"></div>
+          <div class="bars">${rates.map(g => `<div class="col" tabindex="0" data-tip="Grade ${g.g}|${g.rate.toFixed(1)}%|${g.mod} of ${g.screened} checked in">
+            <div class="val">${Math.round(g.rate)}%</div><div class="bar" style="height:calc(${g.rate / top} * (100% - 18px))"></div><div class="xl">Grade ${g.g}</div></div>`).join("")}</div>
+          <div class="tip" id="rtip"></div>
+        </div></div>
+      <div class="card"><b>By grade</b>
+        <table class="list" style="margin-top:8px"><tr><th>Grade</th><th>Consent</th><th>Checked in</th><th>Moderate+</th><th>Safety alerts</th></tr>` +
+        R.grades.map(g => `<tr><td>${g.g}</td><td class="mono">${pct(g.consented, g.enrolled)}%</td><td class="mono">${g.screened}</td><td class="mono">${g.mod} (${Math.round(100 * g.mod / g.screened)}%)</td><td class="mono">${g.alerts}</td></tr>`).join("") +
+        `</table><p class="muted small-t" style="margin-top:10px">Compare with spring re-screening to see whether supports are working. Snowpine can break this out by program (for example, students with IEPs) only when each group has 10 or more students.</p></div>
+    </div>`;
+  const el = document.getElementById("c-report");
+  el.innerHTML = h;
+  const chart = el.querySelector("#rchart"), tip = el.querySelector("#rtip");
+  chart.querySelectorAll(".col").forEach(c => {
+    const show = () => {
+      const [t, v, n] = c.dataset.tip.split("|");
+      tip.textContent = "";
+      const b = document.createElement("b"); b.textContent = v;
+      tip.append(b, document.createTextNode(` ${t}, ${n}`));
+      tip.style.display = "block";
+      const cr = c.getBoundingClientRect(), pr = chart.getBoundingClientRect();
+      tip.style.left = Math.max(0, cr.left - pr.left + cr.width / 2 - tip.offsetWidth / 2) + "px";
+      tip.style.top = (cr.top - pr.top + c.offsetHeight - c.querySelector(".bar").offsetHeight - 52) + "px";
+    };
+    c.addEventListener("pointerenter", show); c.addEventListener("focus", show);
+    c.addEventListener("pointerleave", () => tip.style.display = "none"); c.addEventListener("blur", () => tip.style.display = "none");
+  });
+}
+function safetyDone(id) { stu(id).safetyDone = true; setFollow(id, 2, true); renderCounselor(); toast("Logged. The alert is closed."); }
+function renderDrawer() {
+  const s = stu(ST.selected), d = document.getElementById("drawer");
+  if (!s) { d.innerHTML = `<span class="muted">Pick a student.</span>`; return; }
+  let h = `<div class="label">Grade ${s.grade}</div><h2>${esc(s.name)}</h2>`;
+  if (s.consent !== "yes") {
+    h += `<div class="sec">${s.consent === "pending"
+      ? `<p>Waiting on parent consent. Screening cannot start until it is signed.</p><p class="muted small-t">Consent request sent ${s.consentAsked} time(s), by email and text.</p><button class="ghost small" onclick="resend('${s.id}')">Resend consent request</button> <button class="small" onclick="signConsent('${s.id}')">Demo: parent signs</button>`
+      : `<p>The parent opted out of screening. Snowpine holds nothing for this student.</p>`}</div>`;
+    d.innerHTML = h; return;
+  }
+  h += `<div class="sec"><div class="label">Check-in</div>`;
+  if (!s.screened) h += `<p class="muted">Not checked in yet.</p><button class="small ghost" onclick="kioskFor('${s.id}')">Open check-in for ${esc(s.name.split(" ")[0])}</button>`;
+  else {
+    h += `<div class="result-line"><span>Depression, PHQ-A</span>${scoreChip(s.phq, phqBand(s.phq))}</div>
+          <div class="result-line"><span>Anxiety, GAD-7</span>${scoreChip(s.gad, gadBand(s.gad))}</div>
+          <div class="result-line"><span>Safety questions</span>${isUrgent(s) ? `<span class="chip c-bad">${s.safetyDone ? "positive, seen today" : "positive, see today"}</span>` : `<span class="chip c-ok">all no</span>`}</div>`;
+  }
+  if (needsFollow(s)) {
+    h += `</div><div class="sec"><div class="label">Follow-up</div><div class="seg">` +
+      FOLLOW.map((f, i) => `<button class="${s.follow === i ? "on" : ""}" onclick="setFollow('${s.id}',${i})">${f}</button>`).join("") + `</div>`;
+    if (s.followLog && s.followLog.length) h += `<div class="muted small-t" style="margin-top:6px">${s.followLog.map(esc).join("<br>")}</div>`;
+  }
+  h += `</div><div class="sec"><div class="label">Teacher ADHD ratings</div>`;
+  if (!s.teacher) h += `<p class="muted small-t" style="margin:4px 0 8px">Two teachers who see the student daily give the best picture.</p><button class="small ghost" onclick="sendTeacher('${s.id}')">Send form to 2 teachers</button>`;
+  else {
+    h += s.teacher.sent.map(t => { const r = s.teacher.done.find(x => x.by === t);
+      return `<div class="doc">${r ? "✅" : "⏳"} ${esc(t)} ${r ? `<span class="muted small-t">inattentive ${r.inatt}/9 · hyperactive ${r.hyper}/9 · impaired ${r.impair}/8</span>` : `<button class="small ghost" style="margin-left:auto" onclick="openTeacher('${s.id}','${esc(t)}')">Open as teacher</button>`}</div>`; }).join("");
+  }
+  h += `</div><div class="sec"><div class="label">IEP, 504, testing</div>`;
+  h += s.docs.map(f => `<div class="doc">📄 ${esc(f)}</div>`).join("") || `<p class="muted small-t" style="margin:4px 0">No records on file.</p>`;
+  if (s.digest) h += `<div class="doc" style="margin-top:4px"><span class="chip c-ok">Summary ready</span><span class="muted small-t">every fact checked against the files</span></div>`;
+  h += `<div class="drop" style="margin-top:8px" onclick="addDoc('${s.id}')">Drop an IEP, 504, or evaluation PDF here</div>`;
+  h += `</div><div class="sec"><div class="label">Family</div>`;
+  if (s.family === "none") h += `<p class="small-t muted" style="margin:4px 0 8px">Parents get the result in plain words, with crisis numbers and a list of local options. They decide what happens next.</p><button class="small" ${s.screened ? "" : "disabled"} onclick="sendFamily('${s.id}')">Send results to family</button>`;
+  else if (s.family === "sent") h += `<p class="small-t">Results sent. Waiting on the family.</p><button class="small ghost" onclick="ST.familyFor='${s.id}';go('family')">See what the family sees</button>`;
+  else if (s.family === "shared") h += `<p class="small-t">The family shared records with <b>${esc(ST.practices.find(p => p.id === s.practice).name)}</b>.</p>`;
+  else h += `<p class="small-t muted">The family chose not to pursue care now. You can follow up at your discretion.</p>`;
+  d.innerHTML = h + "</div>";
+}
+function setFollow(id, i, quiet) {
+  const s = stu(id);
+  if (i <= s.follow && quiet) return;
+  s.follow = i;
+  (s.followLog = s.followLog || []).unshift(`Today: ${FOLLOW[i].toLowerCase()}`);
+  renderCounselor();
+  if (!quiet) toast(`${s.name.split(" ")[0]}: ${FOLLOW[i].toLowerCase()}`);
+}
+function resend(id) { stu(id).consentAsked++; renderCounselor(); toast("Consent request resent"); }
+function signConsent(id) { stu(id).consent = "yes"; renderCounselor(); toast("Parent consent on file"); }
+function kioskFor(id) { go("student"); resetKiosk(); document.getElementById("kiosk-who").value = id; }
+function sendTeacher(id) { stu(id).teacher = { sent: ["Ms. Rivera (English)", "Mr. Okoye (Biology)"], done: [] }; renderCounselor(); toast("Form links sent to 2 teachers"); }
+function addDoc(id) {
+  const s = stu(id), n = s.docs.length;
+  s.docs.push(["iep_" + s.id + ".pdf", "504_plan_" + s.id + ".pdf", "evaluation_" + s.id + ".pdf"][n % 3]);
+  renderCounselor(); toast("Uploaded. Demo only: the summary is built for Jordan's sample files.");
+}
+function sendFamily(id) { stu(id).family = "sent"; setFollow(id, 2, true); ST.familyFor = id; renderCounselor(); toast("Results sent to the family by email and text"); }
+
+/* ---------------- teacher ---------------- */
+let teacherLoaded = null;
+function openTeacher(id, who) { ST.teacherFor = { id, who }; teacherLoaded = null; go("teacher"); }
+function loadTeacher() {
+  const s = ST.teacherFor ? stu(ST.teacherFor.id) : stu("jordan");
+  const who = ST.teacherFor ? ST.teacherFor.who : s.teacher.sent.find(t => !s.teacher.done.some(d => d.by === t)) || s.teacher.sent[0];
+  ST.teacherFor = { id: s.id, who };
+  document.getElementById("teacher-title").textContent = `Rating for ${s.name}`;
+  document.getElementById("teacher-lede").innerHTML = `Sent to <b>${esc(who)}</b>. About 10 minutes. When you click Done, the result goes to the counselor and, if the family agrees, to the student's psychiatrist. <span class="muted">The Vanderbilt is normed for ages 6 to 12, so for a high schooler the psychiatrist reads it as one input among several.</span>`;
+  const key = s.id + "|" + who;
+  if (teacherLoaded === key) return;
+  teacherLoaded = key;
+  const f = document.getElementById("teacher-frame");
+  f.onload = () => {
+    const w = f.contentWindow, doc = f.contentDocument;
+    doc.getElementById("student").value = s.name;
+    doc.getElementById("grade").value = s.grade;
+    doc.getElementById("teacher").value = who.replace(/ \(.*/, "");
+    doc.getElementById("subject").value = (who.match(/\((.*)\)/) || [, ""])[1];
+    doc.getElementById("done").addEventListener("click", () => setTimeout(() => {
+      if (doc.getElementById("result").style.display !== "block") return;
+      const r = w.score();
+      const t = s.teacher || (s.teacher = { sent: [who], done: [] });
+      t.done = t.done.filter(d => d.by !== who).concat({ by: who, inatt: r.inatt.length, hyper: r.hyper.length, impair: r.impaired.length });
+      t.adhd = t.done.some(d => (d.inatt >= 6 || d.hyper >= 6) && d.impair > 0);
+      toast(`${who.replace(/ \(.*/, "")}'s rating is in. The counselor sees it now.`);
+    }, 0));
+  };
+  f.srcdoc = JSON.parse(document.getElementById("teacher-form").textContent);
+}
+
+/* ---------------- family ---------------- */
+function plain(band, what) {
+  return { Minimal: `few or no signs of ${what}`, Mild: `some mild signs of ${what}`, Moderate: `moderate signs of ${what}`,
+    "Moderately severe": `signs of ${what} that are more than moderate`, Severe: `strong signs of ${what}` }[band];
+}
+const CONDS = { depression: "Depression", anxiety: "Anxiety", adhd: "ADHD", eating: "Eating disorders", substance: "Substance use", psychosis: "Psychosis" };
+function concernsOf(s) {
+  const c = [];
+  if (s.phq >= 10) c.push("depression");
+  if (s.gad >= 10) c.push("anxiety");
+  if (s.teacher && s.teacher.adhd) c.push("adhd");
+  return c;
+}
+function practiceFit(s) {  // why Brentwood cannot take this student, or null
+  const st = ST.settings, age = s.grade + 5;
+  if (!st.accepting) return "Not taking new patients right now";
+  if (s.declinedBy === "brentwood") return "Could not take this referral";
+  if (age < st.ageMin || age > st.ageMax) return `Sees ages ${st.ageMin} to ${st.ageMax}`;
+  if (st.thisWeek >= st.cap) return "Full this week";
+  const c = concernsOf(s);
+  if (c.length && !c.some(k => st.conditions[k])) return `Does not treat ${c.map(k => k === "adhd" ? "ADHD" : CONDS[k].toLowerCase()).join(" or ")}`;
+  return null;
+}
+const insOf = p => p.id === "brentwood" ? ST.settings.ins : p.ins;
+function renderFamily() {
+  const s = stu(ST.familyFor) || stu("jordan"), first = s.name.split(" ")[0], el = document.getElementById("family");
+  const sentTo = ST.students.filter(x => x.family !== "none").map(x => `<option value="${x.id}" ${x.id === s.id ? "selected" : ""}>${esc(x.name)}</option>`).join("");
+  let h = `<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px"><span class="muted small-t">Demo: viewing as the parent of</span><select onchange="ST.familyFor=this.value;ST.picked=null;renderFamily()" id="family-who">${sentTo}</select></div>
+    <div class="label">From Westview High School counseling, through Snowpine</div>
+    <h1 style="margin:4px 0 8px">${esc(first)}'s wellness check-in</h1>
+    <p class="lede">Thank you for giving consent. Here is what ${esc(first)}'s answers showed, in plain words. This is a screening, not a diagnosis. It tells us whether a conversation with a professional would help.</p>
+    <div class="card">
+      <div class="result-line"><span>Mood (PHQ-A, score ${s.phq} of 27)</span><span>${scoreChip(s.phq, phqBand(s.phq))}</span></div>
+      <div class="muted small-t" style="padding:4px 0 8px">${esc(first)}'s answers showed ${plain(phqBand(s.phq), "depression")}.</div>
+      <div class="result-line"><span>Worry (GAD-7, score ${s.gad} of 21)</span><span>${scoreChip(s.gad, gadBand(s.gad))}</span></div>
+      <div class="muted small-t" style="padding:4px 0 8px">${esc(first)}'s answers showed ${plain(gadBand(s.gad), "anxiety")}.</div>
+      ${s.teacher && s.teacher.done.length ? `<div class="result-line"><span>Attention (teacher ratings, ${s.teacher.done.length} back)</span><span class="chip ${s.teacher.adhd ? "c-warn" : "c-ok"}">${s.teacher.adhd ? "signs worth a closer look" : "no strong signs"}</span></div>` : ""}
+      ${isUrgent(s) ? `<p style="color:var(--danger)"><b>${esc(first)} answered yes to a question about self-harm.</b> The counselor has already met with ${esc(first)} and will call you today.</p>` : ""}
+    </div>`;
+  if (s.family === "shared") {
+    const p = ST.practices.find(p => p.id === s.practice);
+    el.innerHTML = h + `<div class="card" style="margin-top:16px;background:var(--pine-soft);border-color:var(--pine)"><h3>Sent to ${esc(p.name)}</h3><p>They will contact you to schedule, usually within 2 business days. You can withdraw the shared records any time by replying to the email you received.</p><button class="ghost small" onclick="go('psych')">Demo: see the psychiatrist's side</button></div>`;
+    return;
+  }
+  if (s.declinedBy) h += `<div class="card" style="margin-top:16px;background:var(--amber-soft);border-color:#e0c48f"><b>${esc(ST.practices.find(p => p.id === s.declinedBy).name)} could not take ${esc(first)} right now</b> (${esc(s.declineReason)}). They keep nothing beyond what you shared, and you can pick another option below.</div>`;
+  h += `<h2 style="margin:26px 0 10px">What you can do next</h2>
+    <div class="grid g3">
+      <div class="choice"><b>Talk with your pediatrician</b><p class="muted small-t">Print this page and bring it to the next visit.</p><button class="ghost small" onclick="window.print()">Print</button></div>
+      <div class="choice"><b>Meet the school counselor</b><p class="muted small-t">Free, at school, this week or next.</p><button class="ghost small" onclick="toast('Counselor meeting requested')">Request a meeting</button></div>
+      <div class="choice" style="border-color:var(--pine)"><b>Get care outside school</b><p class="muted small-t">Therapy, a psychiatrist for an evaluation and medication options, or both. Choose below.</p></div>
+    </div>
+    <h3 style="margin:22px 0 2px">Care near Westview</h3>
+    <div class="dirbar" id="directory-bar">
+      <select onchange="ST.famIns=this.value;renderFamily()">${["", "Medi-Cal", "Kaiser", "Blue Shield", "Aetna", "Cigna", "No insurance", "Other"].map(i => `<option value="${i}" ${ST.famIns === i ? "selected" : ""}>${i ? "Insurance: " + i : "Your insurance (optional)"}</option>`).join("")}</select>
+      <div class="filters" style="margin:0">${[["all", "All"], ["free", "Free or low cost"], ["meds", "Psychiatrist (medication)"], ["therapy", "Therapy"]].map(([k, l]) => `<button class="${ST.dirFilter === k ? "on" : ""}" onclick="ST.dirFilter='${k}';renderFamily()">${l}</button>`).join("")}</div>
+    </div>
+    <p class="muted small-t" style="margin:0 0 10px">Sorted by distance. Public, nonprofit, and school programs are listed free. Private practices pay a flat listing fee. Nobody pays per family, and nobody can pay for a higher spot.</p>
+    <div class="grid g3" id="directory">` + ST.practices
+      .filter(p => ST.dirFilter === "all" || (ST.dirFilter === "free" && p.free) || (ST.dirFilter === "meds" && p.meds) || (ST.dirFilter === "therapy" && /therapy/i.test(p.kind)))
+      .slice().sort((a, b) => a.miles - b.miles)
+      .map(p => {
+        const ins = insOf(p), off = p.id === "brentwood" ? practiceFit(s) : null;
+        let insChip = "";
+        if (ST.famIns) insChip = ins.includes("Any") || ins.includes(ST.famIns) ? `<span class="chip c-ok">takes your insurance</span>`
+          : ins.includes("Out of network") ? `<span class="chip c-warn">out of network</span>` : `<span class="chip c-none">not in your plan</span>`;
+        return `<div class="practice ${ST.picked === p.id ? "on" : ""} ${off ? "off" : ""}" ${off ? "" : `onclick="ST.picked='${p.id}';renderFamily()"`}>
+          <b>${esc(p.name)}</b><div class="muted small-t">${esc(p.kind)} · ${p.miles ? p.miles + " miles" : "on campus"}${p.tele ? " · video visits too" : ""}</div>
+          <div class="small-t" style="margin-top:6px">${esc(p.cost)}</div><div class="small-t">${p.id === "brentwood" || p.free ? "" : esc(ins.join(", ")) + "<br>"}New patients: <b>${esc(p.next)}</b></div>
+          <div class="tagrow"><span class="chip ${p.free ? "c-ok" : "c-none"}">${esc(p.listing)}</span>${insChip}${off ? `<span class="chip c-bad">${esc(off)}</span>` : ""}</div></div>`;
+      }).join("") + `</div>`;
+  if (ST.picked) {
+    const p = ST.practices.find(p => p.id === ST.picked);
+    h += `<div class="card consent" style="margin-top:16px">
+      <h3>Share with ${esc(p.name)}</h3>
+      <p class="muted small-t" style="margin:4px 0">Choose what they receive. Nothing is shared until you click Send. Sharing saves you from filling out their intake forms.</p>
+      <label><input type="checkbox" id="sh-screen" checked> <span>Check-in results (the scores above)</span></label>
+      ${s.teacher && s.teacher.done.length ? `<label><input type="checkbox" id="sh-teacher" checked> <span>Teacher attention ratings (${s.teacher.done.length})</span></label>` : ""}
+      ${s.docs.length ? `<label><input type="checkbox" id="sh-docs" checked> <span>IEP, 504, and testing records (${s.docs.length} files), with a summary</span></label>` : ""}
+      <label style="margin-top:12px"><span>Parent or guardian name</span></label>
+      <input type="text" id="sh-sign" placeholder="Type your full name to sign" style="width:320px">
+      <div style="margin-top:12px"><button onclick="share('${s.id}')">Send to ${esc(p.name.split(" ")[0])}</button>
+      <button class="ghost" onclick="ST.picked=null;renderFamily()">Cancel</button></div></div>`;
+  }
+  h += `<div class="crisis"><b>If ${esc(first)} is in danger right now</b>, call or text <b>988</b>, or call 911.</div>
+    <p style="margin-top:14px"><a href="#" onclick="declineCare('${s.id}');return false" class="muted small-t">We are not looking for care right now</a></p>`;
+  el.innerHTML = h;
+}
+function share(id) {
+  const name = document.getElementById("sh-sign").value.trim();
+  if (name.length < 3) { toast("Type your name to sign"); return; }
+  const scope = ["screen", "teacher", "docs"].filter(k => { const c = document.getElementById("sh-" + k); return c && c.checked; });
+  if (!scope.length) { toast("Choose at least one thing to share"); return; }
+  const s = stu(id);
+  s.family = "shared"; s.practice = ST.picked; s.declinedBy = null;
+  if (needsFollow(s)) setFollow(id, 3, true);
+  if (ST.picked === "brentwood") {
+    ST.settings.thisWeek++;
+    ST.referrals = ST.referrals.filter(r => r.id !== "r-" + id);
+    ST.referrals.unshift({ id: "r-" + id, sid: id, name: s.name, grade: s.grade, school: "Westview High School", when: "Today", scope, signedBy: name, status: "New" });
+    ST.openRef = "r-" + id;
+  }
+  ST.picked = null; renderFamily(); toast("Sent. The practice will reach out to schedule.");
+}
+function declineCare(id) { stu(id).family = "declined"; toast("Noted. The counselor is told, and nothing is shared."); go("counselor"); }
+
+/* ---------------- psychiatrist ---------------- */
+function liveRef(r) {  // pull current data for referrals that came from this demo's students
+  if (!r.sid) return r;
+  const s = stu(r.sid);
+  return Object.assign({}, r, { phq: s.phq, gad: s.gad, urgent: isUrgent(s), teacher: s.teacher && s.teacher.done.length ? s.teacher : null, docs: s.digest, docFiles: s.docs });
+}
+function renderPsych() {
+  const refs = ST.referrals.map(liveRef);
+  if (!ST.openRef && refs.length) ST.openRef = refs[0].id;
+  const st = ST.settings;
+  document.getElementById("practice-kpis").innerHTML = [
+    ["Waiting on you", refs.filter(r => r.status === "New").length, "offer a first appointment or decline"],
+    ["This week", `${st.thisWeek}<span class="muted" style="font-size:18px"> / ${st.cap}</span>`, st.accepting ? (st.thisWeek >= st.cap ? "full, hidden until Monday" : "referrals under your cap") : "paused, families see the next option"],
+    ["Your plan", "Listing", "flat monthly fee · no per-referral fee"],
+  ].map(([l, b, d]) => `<div class="card"><div class="label">${l}</div><div class="big">${b}</div><div class="muted small-t">${d}</div></div>`).join("");
+  document.getElementById("inbox").innerHTML = refs.map(r => `<div class="inbox-item ${ST.openRef === r.id ? "on" : ""}" onclick="ST.openRef='${r.id}';renderPsych()">
+    <div style="display:flex;justify-content:space-between"><b>${esc(r.name)}</b><span class="muted small-t">${esc(r.when)}</span></div>
+    <div class="muted small-t">Grade ${r.grade} · ${esc(r.school)}</div>
+    <div style="margin-top:4px">${scoreChip(r.phq, phqBand(r.phq)).replace(/<\/span>$/, " mood</span>")} ${scoreChip(r.gad, gadBand(r.gad)).replace(/<\/span>$/, " anxiety</span>")} <span class="chip ${r.status === "New" ? "c-info" : "c-none"}">${esc(r.status)}</span></div></div>`).join("");
+  const r = refs.find(x => x.id === ST.openRef);
+  document.getElementById("packet").innerHTML = r ? packetHTML(r) : `<span class="muted">No referral selected.</span>`;
+  document.getElementById("psych-tabs").innerHTML = [["referrals", "Referrals"], ["settings", "Listing settings"]].map(([k, l]) =>
+    `<button class="${ST.psychTab === k ? "on" : ""}" onclick="ST.psychTab='${k}';renderPsych()">${l}</button>`).join("");
+  document.getElementById("psych-referrals").style.display = ST.psychTab === "referrals" ? "" : "none";
+  document.getElementById("psych-settings").style.display = ST.psychTab === "settings" ? "" : "none";
+  renderSettings();
+}
+function renderSettings() {
+  const st = ST.settings, ages = Array.from({ length: 13 }, (_, i) => i + 6);
+  const sel = (key, val) => `<select onchange="ST.settings.${key}=+this.value;settingsChanged()">${ages.map(a => `<option ${a === val ? "selected" : ""}>${a}</option>`).join("")}</select>`;
+  const INS = ["Out of network", "Aetna", "Blue Shield", "Cigna", "Medi-Cal", "Kaiser"];
+  const shown = Object.keys(CONDS).filter(k => st.conditions[k]).map(k => k === "adhd" ? "ADHD" : CONDS[k].toLowerCase());
+  document.getElementById("psych-settings").innerHTML = `<div class="settings-grid">
+    <div>
+      <div class="label">Availability</div>
+      <label><input type="checkbox" ${st.accepting ? "checked" : ""} onchange="ST.settings.accepting=this.checked;settingsChanged()"> <b>Accepting new patients</b></label>
+      <div class="muted small-t" style="margin:0 0 10px 26px">Turn off and families see your listing as not taking patients, with the next option beside it.</div>
+      <label>Ages ${sel("ageMin", st.ageMin)} to ${sel("ageMax", st.ageMax)}</label>
+      <label>No more than <select onchange="ST.settings.cap=+this.value;settingsChanged()">${[2, 5, 10, 20].map(n => `<option ${n === st.cap ? "selected" : ""}>${n}</option>`).join("")}</select> new referrals a week</label>
+      <div class="label" style="margin-top:14px">Conditions you treat</div>
+      ${Object.entries(CONDS).map(([k, l]) => `<label><input type="checkbox" ${st.conditions[k] ? "checked" : ""} onchange="ST.settings.conditions.${k}=this.checked;settingsChanged()"> ${l}</label>`).join("")}
+      <div class="label" style="margin-top:14px">Insurance</div>
+      ${INS.map(i => `<label><input type="checkbox" ${st.ins.includes(i) ? "checked" : ""} onchange="toggleIns('${i}',this.checked)"> ${i}</label>`).join("")}
+    </div>
+    <div>
+      <div class="label">What families see</div>
+      <div class="preview" style="margin-top:6px">
+        <b>Brentwood Child &amp; Adolescent Psychiatry</b>
+        <div class="muted small-t">Psychiatry · 3.1 miles · video visits too</div>
+        <div class="small-t" style="margin-top:6px">${st.ins.length ? esc(st.ins.join(", ")) : "No insurance listed"}</div>
+        <div class="small-t">Ages ${st.ageMin} to ${st.ageMax} · ${shown.length ? esc(shown.join(", ")) : "no conditions selected"}</div>
+        <div class="tagrow">${!st.accepting ? `<span class="chip c-bad">Not taking new patients right now</span>` : st.thisWeek >= st.cap ? `<span class="chip c-bad">Full this week</span>` : `<span class="chip c-ok">Taking new patients</span>`}</div>
+      </div>
+      <p class="muted small-t">A family can only send you a referral when the student's age and concerns match what you set here. Concerns come from the check-in scores and teacher ratings.</p>
+      <div class="label" style="margin-top:14px">Billing</div>
+      <p class="small-t" style="margin:4px 0">One flat monthly listing, which includes Snowpine Letters and Superbills. There is no charge per referral, and your position in the directory is set by distance only.</p>
+    </div></div>`;
+}
+function settingsChanged() { renderAll(); toast("Saved. The family directory is updated."); }
+function toggleIns(i, on) { const st = ST.settings; st.ins = on ? [...new Set([...st.ins, i])] : st.ins.filter(x => x !== i); settingsChanged(); }
+function decline(id) {
+  const reason = document.getElementById("decline-reason").value, r = ST.referrals.find(x => x.id === id);
+  r.status = "Declined"; ST.declining = null;
+  if (r.sid) Object.assign(stu(r.sid), { family: "sent", practice: null, declinedBy: "brentwood", declineReason: reason });
+  renderPsych(); toast("Declined. The family was sent back to the directory with other options.");
+}
+function packetHTML(r) {
+  const has = k => r.scope.includes(k);
+  let h = `<div style="display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap"><div><div class="label">Referral · ${esc(r.school)}</div><h2>${esc(r.name)}, grade ${r.grade}</h2>
+    <div class="muted small-t">Shared by the family ${esc(r.when.toLowerCase())}${r.signedBy ? `, signed by ${esc(r.signedBy)}` : ""}. Shared: ${r.scope.map(k => ({ screen: "check-in", teacher: "teacher ratings", docs: "school records" })[k]).join(", ")}.</div></div>
+    <div class="spacer"></div>${r.status === "New" ? `<div style="display:flex;gap:6px"><button onclick="offer('${r.id}')">Offer first appointment</button><button class="ghost" onclick="ST.declining='${r.id}';renderPsych()">Can't take this one</button></div>` : `<span class="chip ${r.status === "Declined" ? "c-none" : "c-ok"}">${esc(r.status)}</span>`}</div>`;
+  if (ST.declining === r.id) h += `<div class="card" style="margin-top:10px;background:var(--sunken)"><b>Decline this referral?</b> The family is told right away and sent back to the directory. No reason is required beyond one of these.
+    <div style="margin-top:8px;display:flex;gap:8px"><select id="decline-reason"><option>No openings soon</option><option>Outside my scope</option><option>Needs a higher level of care</option></select><button class="small" onclick="decline('${r.id}')">Decline</button><button class="small ghost" onclick="ST.declining=null;renderPsych()">Keep it</button></div></div>`;
+  if (r.urgent) h += `<div class="urgent" style="margin-top:12px"><b style="color:var(--danger)">Positive on suicide or self-harm questions at screening.</b> The school completed its same-day safety check before results went to the family. Snowpine routes the referral. It does not hand crisis responsibility to you. If you cannot see the student soon, decline and the family is redirected.</div>`;
+  const done = [
+    [has("screen"), "Depression and anxiety scores"],
+    [has("teacher") && !!r.teacher, "Teacher ADHD ratings"],
+    [has("docs") && !!r.docs, "IEP, 504, and testing read, with every fact tied to its page"],
+    [has("docs") && !!r.docs && PACKET && PACKET.gaps, "Missing pieces listed before the visit"],
+    [has("docs") && !!r.docs && PACKET && PACKET.suggested_letter, "School letter outlined"],
+  ];
+  h += `<div class="preview" style="margin-top:12px"><div class="label">Done before visit 1</div><ul class="donelist" style="margin:6px 0 0">` +
+    done.map(([ok, t]) => `<li>${ok ? "✅" : "<span class='muted'>○</span>"} <span class="${ok ? "" : "muted"}">${t}</span></li>`).join("") + "</ul></div>";
+
+  h += `<h3>Check-in</h3>` + (has("screen") ? `<div class="grid g2" style="margin-top:6px">
+      <div><div class="label">PHQ-A</div>${scoreChip(r.phq, phqBand(r.phq))}</div><div><div class="label">GAD-7</div>${scoreChip(r.gad, gadBand(r.gad))}</div></div>` : `<p class="locked">Not shared by the family.</p>`);
+
+  h += `<h3>Teacher ratings (Vanderbilt)</h3>`;
+  if (!has("teacher") && r.teacher) h += `<p class="locked">Not shared by the family.</p>`;
+  else if (!r.teacher) h += `<p class="muted">None collected.</p>`;
+  else {
+    const rows = r.teacher.done || [Object.assign({ by: "Teacher" }, r.teacher)];
+    h += `<table class="list"><tr><th>Teacher</th><th>Inattentive</th><th>Hyperactive</th><th>Impaired areas</th></tr>` + rows.map(d =>
+      `<tr><td>${esc(d.by)}</td><td class="mono">${d.inatt}/9 ${d.inatt >= 6 ? "●" : ""}</td><td class="mono">${d.hyper}/9 ${d.hyper >= 6 ? "●" : ""}</td><td class="mono">${d.impair}/8</td></tr>`).join("") +
+      `</table><div class="muted small-t">● meets the symptom count. Vanderbilt norms run to age 12, so read it alongside history.</div>`;
+  }
+
+  h += `<h3>School records</h3>`;
+  if (!r.docs) h += `<p class="muted">No IEP, 504, or testing records shared.</p>`;
+  else if (!has("docs")) h += `<p class="locked">Not shared by the family.</p>`;
+  else if (!PACKET) h += `<p class="muted">Summary not built. Run build_app.py after digest.py.</p>`;
+  else h += recordsHTML(r);
+  return h;
+}
+function cite(it) { return `<span class="src">${esc(it.source)} p.${it.page}</span>`; }
+function recordsHTML(r) {
+  const P = PACKET, s = r.sid ? stu(r.sid) : null;
+  const teacherIn = s && s.teacher && s.teacher.done.length;
+  let h = `<div class="muted small-t" style="margin:4px 0 8px">${(r.docFiles || []).map(esc).join(" · ")}. Every fact below is quoted from the file and page shown.</div>`;
+  h += `<div class="label" style="margin-top:10px">Before the visit</div>` + (P.gaps || []).map(g => {
+    let fix = "";
+    if (teacherIn && /teacher/i.test(g.text) && /rating|scale/i.test(g.text)) fix = "teacher ratings collected by Snowpine";
+    else if (s && s.screened && r.scope.includes("screen") && /anxiety|mood|depress/i.test(g.text)) fix = `screened at school: PHQ-A ${s.phq}, GAD-7 ${s.gad}`;
+    return `<div class="gap-item ${fix ? "resolved" : ""}"><b>${esc(g.text.replace(/\.$/, ""))}.</b> ${esc(g.why)}${fix ? ` <span class="chip c-ok">${fix}</span>` : ""}</div>`;
+  }).join("");
+  if (P.suggested_letter) h += `<div class="lettercard" style="margin-top:10px"><div class="label">Suggested letter</div><b>${esc(P.suggested_letter.type)}.</b> ${esc(P.suggested_letter.why)}
+     <div style="margin-top:8px"><button class="small" onclick="toast('Opens a draft in Snowpine Letters, in your voice, citing these records')">Draft in Snowpine Letters</button></div></div>`;
+  const list = (title, items) => items && items.length ? `<div class="label" style="margin-top:14px">${title}</div><ul>` + items.map(it => `<li>${esc(it.text)}${cite(it)}</li>`).join("") + "</ul>" : "";
+  h += list("Diagnoses named in the records", P.diagnoses) + list("Eligibility", P.eligibility);
+  if (P.scores && P.scores.length) h += `<div class="label" style="margin-top:14px">Test scores</div><table class="list"><tr><th>Test</th><th>Measure</th><th>Score</th><th>%ile</th><th></th></tr>` +
+    P.scores.map(x => `<tr><td>${esc(x.test)}</td><td>${esc(x.measure)}</td><td class="mono"><b>${esc(x.score)}</b></td><td class="mono">${esc(x.percentile)}</td><td>${cite(x)}</td></tr>`).join("") + "</table>";
+  h += list("Services", P.services) + list("Accommodations", P.accommodations) + list("Teacher and parent concerns", P.concerns) + list("Key dates", P.key_dates);
+  return h;
+}
+function offer(id) { ST.referrals.find(r => r.id === id).status = "Appointment offered"; renderPsych(); toast("Appointment times sent to the family"); }
+
+/* ---------------- guided tour ---------------- */
+const JORDAN = {
+  phq: [2, 2, 1, 1, 2, 1, 2, 0, 0], extra: { year: 1, month: 0, ever: 0 }, gad: [2, 2, 2, 2, 1, 2, 1],   // PHQ-A 11, GAD-7 12
+  teacher: [2, 2, 2, 0, 2, 2, 1, 2, 2,  1, 2, 2, 0, 1, 1, 2, 0, 1,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 2, 0, 0, 0, 0, 0,  2, 2, 4, 2, 3, 2, 3, 3],
+};
+function fillKiosk(a) {
+  const set = (n, v) => document.querySelector(`input[name="${n}"][value="${v}"]`).checked = true;
+  a.phq.forEach((v, i) => set("phq" + i, v));
+  Object.entries(a.extra).forEach(([k, v]) => set("x" + k, v));
+  a.gad.forEach((v, i) => set("gad" + i, v));
+}
+function fillTeacher(vals) {
+  const f = document.getElementById("teacher-frame"), t0 = Date.now();
+  const tick = setInterval(() => {
+    const d = f.contentDocument;
+    if (Date.now() - t0 > 5000) return clearInterval(tick);
+    if (!d || !d.getElementById("done") || !d.getElementById("student").value) return;
+    clearInterval(tick);
+    vals.forEach((v, i) => d.querySelector(`input[name=q${i + 1}][value="${v}"]`).checked = true);
+    d.getElementById("done").click();
+  }, 60);
+}
+function tourPrep() {
+  ST = seed();
+  Object.assign(stu("jordan"), { screened: false, phq: null, gad: null, teacher: null, family: "none" });
+  teacherLoaded = null; ST.teacherFor = null;
+  resetKiosk();
+}
+const TOUR = [
+  { v: "overview", sel: "#steps", t: "One student, start to finish",
+    b: "Follow Jordan, a 10th grader at Westview High, from a 5-minute check-in to a psychiatrist's inbox. Every screen is live, and you can click around at any point." },
+  { v: "counselor", sel: "#kpis", t: "The counselor's morning",
+    b: "The whole school at a glance: who has parent consent, who has checked in, and who needs follow-up first." },
+  { v: "counselor", sel: "#urgent", t: "A safety alert cannot be missed",
+    b: "Diego answered yes to the self-harm question. The counselor and a backup are alerted right away, and the counselor runs the ASQ and calls home. Check-in closes at 2:30 pm, so nothing lands after hours." },
+  { v: "student", sel: "#phq", t: "Jordan checks in",
+    b: "Five minutes on a school Chromebook: the PHQ-A for depression and the GAD-7 for anxiety. Only students whose parents consented are listed.",
+    post() { if (!stu("jordan").screened) { kioskFor("jordan"); fillKiosk(JORDAN); } } },
+  { v: "student", sel: "#kiosk-done", t: "No score for the student",
+    b: "Jordan sees a thank-you, not a score. The 988 line is always on screen.",
+    pre() { if (!stu("jordan").screened) { if (!document.querySelector('input[name="phq0"]:checked')) { kioskFor("jordan"); fillKiosk(JORDAN); } submitScreen(); } } },
+  { v: "counselor", sel: "#drawer", t: "Jordan lands in the queue",
+    b: "Moderate depression and anxiety, so Jordan is flagged for follow-up. The IEP, 504, and testing are already on file. One click asks two teachers for ADHD ratings.",
+    pre() { ST.filter = "all"; ST.selected = "jordan"; if (!stu("jordan").teacher) sendTeacher("jordan"); } },
+  { v: "teacher", sel: "#teacher-frame", t: "The teacher's 10 minutes",
+    b: "Ms. Rivera gets a link with Jordan's name filled in. It scores itself when she clicks Done, and the result goes straight back to the counselor.",
+    pre() { const j = stu("jordan"); if (!j.teacher) sendTeacher("jordan"); ST.teacherFor = { id: "jordan", who: j.teacher.sent[0] }; teacherLoaded = null; },
+    post() { if (!stu("jordan").teacher.done.length) fillTeacher(JORDAN.teacher); } },
+  { v: "counselor", sel: "#drawer", t: "Results go to the family",
+    b: "The teacher's rating is back. The counselor sends Jordan's results to the family by email and text.",
+    pre() { ST.selected = "jordan"; if (stu("jordan").family === "none") sendFamily("jordan"); } },
+  { v: "family", sel: "#directory", t: "The family decides",
+    b: "Plain words, not jargon. The directory leads with free options: the school wellness center, a community clinic, county mental health. Private practices pay a flat listing, never per family.",
+    pre() { ST.familyFor = "jordan"; ST.picked = null; } },
+  { v: "family", sel: ".consent", t: "Sharing is item by item",
+    b: "Jordan's parent picks Brentwood and chooses exactly what to send. Nothing moves until they sign.",
+    pre() { ST.familyFor = "jordan"; if (stu("jordan").family !== "shared") ST.picked = "brentwood"; },
+    post() { const n = document.getElementById("sh-sign"); if (n) n.value = "Jordan's parent (demo)"; } },
+  { v: "psych", sel: "#packet", t: "The psychiatrist's packet",
+    b: "Scores, teacher ratings, and the records summary with every fact tied to its page. Gaps the school already filled turn green, and the IEP letter is outlined.",
+    pre() {
+      const j = stu("jordan");
+      if (j.family !== "shared") {
+        if (!j.screened) Object.assign(j, { screened: true, phq: 11, gad: 12 });
+        ST.familyFor = "jordan"; ST.picked = "brentwood"; renderFamily();
+        document.getElementById("sh-sign").value = "Jordan's parent (demo)"; share("jordan");
+      }
+      ST.psychTab = "referrals"; ST.openRef = "r-jordan"; ST.declining = null;
+    } },
+  { v: "psych", sel: "#psych-settings", t: "The practice stays in control",
+    b: "Ages, conditions, insurance, and a weekly cap. When the practice is full or paused, families see the next option. One flat fee, with no per-referral charge.",
+    pre() { ST.psychTab = "settings"; } },
+  { v: "counselor", sel: "#c-report", t: "What the principal sees",
+    b: "Every follow-up the counselor logs rolls up into a school report with no names: consent, check-ins, moderate-or-higher by grade, and safety alerts seen the same day. This is what wins the second year.",
+    pre() { ST.psychTab = "referrals"; ST.counselorTab = "report"; } },
+  { v: "overview", sel: "#v-overview .cta", t: "That's the whole loop",
+    b: "Free for schools and families, and a flat listing for practices. A pilot is one grade for one semester. The counselor and practice pages answer the questions each side asks first.",
+    pre() { ST.psychTab = "referrals"; } },
+];
+let tourAt = -1;
+function startTour(i) { if (i === 0) tourPrep(); tourStep(Math.max(0, i)); }
+function tourStep(i) {
+  tourAt = i;
+  const st = TOUR[i];
+  document.querySelectorAll(".tour-hi").forEach(e => e.classList.remove("tour-hi"));
+  ST.counselorTab = "caseload";
+  if (st.pre) st.pre();
+  go(st.v);
+  if (st.post) st.post();
+  document.getElementById("tourbox").className = "tourbox on";
+  document.getElementById("tourbox").innerHTML = `<div class="label">Tour · ${i + 1} of ${TOUR.length}</div><h3>${st.t}</h3><p>${st.b}</p>
+    <div style="display:flex;gap:6px">${i ? `<button class="ghost small" onclick="tourStep(${i - 1})">Back</button>` : ""}
+    <div class="spacer"></div><button class="ghost small" onclick="endTour()">Exit</button>
+    ${i < TOUR.length - 1 ? `<button class="small" onclick="tourStep(${i + 1})">Next →</button>` : `<button class="small" onclick="endTour()">Done</button>`}</div>`;
+  setTimeout(() => {
+    const el = document.querySelector(st.sel);
+    if (!el) return;
+    el.classList.add("tour-hi");
+    el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, 80);
+}
+function endTour() { tourAt = -1; document.getElementById("tourbox").className = "tourbox"; document.querySelectorAll(".tour-hi").forEach(e => e.classList.remove("tour-hi")); }
+document.addEventListener("keydown", e => {
+  if (tourAt < 0 || e.target.matches("input, select")) return;
+  if (e.key === "ArrowRight" && tourAt < TOUR.length - 1) tourStep(tourAt + 1);
+  if (e.key === "ArrowLeft" && tourAt > 0) tourStep(tourAt - 1);
+  if (e.key === "Escape") endTour();
+});
+
+/* ---------------- boot ---------------- */
+function renderAll() { renderKiosk(); renderCounselor(); renderFamily(); renderPsych(); }
+renderAll();
+const startView = (location.hash || "").slice(1);
+go(VIEWS.some(v => v[0] === startView) ? startView : "overview");
+</script>
+</body>
+</html>

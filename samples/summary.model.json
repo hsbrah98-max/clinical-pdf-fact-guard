@@ -1,0 +1,274 @@
+{
+  "student": {
+    "name": "Jordan Avery Test",
+    "grade": "10",
+    "school": "Westview High School"
+  },
+  "documents": [
+    {
+      "text": "Individualized Education Program (Westview Unified School District), dated 09/18/2026",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "IEP meeting date: 09/18/2026"
+    },
+    {
+      "text": "Section 504 Accommodation Plan (Cedar Ridge Middle School), dated 10/02/2024",
+      "source": "504_sample.pdf",
+      "page": 1,
+      "quote": "Plan date: 10/02/2024"
+    },
+    {
+      "text": "Neuropsychological Evaluation Summary (Dana Okafor, PhD), dated 05/04/2026 and 05/11/2026",
+      "source": "neuropsych_sample.pdf",
+      "page": 1,
+      "quote": "Dates of testing: 05/04/2026 and"
+    }
+  ],
+  "key_dates": [
+    {
+      "text": "IEP meeting date: 09/18/2026",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "IEP meeting date: 09/18/2026"
+    },
+    {
+      "text": "Next annual IEP review: 09/17/2027",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "Next annual review: 09/17/2027"
+    },
+    {
+      "text": "Triennial reevaluation due: 09/2028",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "Triennial reevaluation due: 09/2028"
+    },
+    {
+      "text": "Neuropsychological testing: 05/04/2026 and 05/11/2026",
+      "source": "neuropsych_sample.pdf",
+      "page": 1,
+      "quote": "Dates of testing: 05/04/2026 and"
+    },
+    {
+      "text": "Prior 504 plan date: 10/02/2024 (superseded by IEP)",
+      "source": "504_sample.pdf",
+      "page": 1,
+      "quote": "Plan date: 10/02/2024"
+    }
+  ],
+  "eligibility": [
+    {
+      "text": "IEP primary eligibility: Other Health Impairment (OHI), based on outside ADHD diagnosis",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "Primary eligibility: Other Health Impairment (OHI)."
+    },
+    {
+      "text": "IEP secondary eligibility: Specific Learning Disability (SLD) in written expression",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "Secondary eligibility: Specific Learning Disability"
+    },
+    {
+      "text": "Prior 504 qualifying condition: ADHD limiting concentrating and learning (superseded by IEP)",
+      "source": "504_sample.pdf",
+      "page": 1,
+      "quote": "Qualifying condition: ADHD, substantially limiting the major life activities of concentrating and learning."
+    }
+  ],
+  "diagnoses": [
+    {
+      "text": "Attention-Deficit/Hyperactivity Disorder, combined presentation, diagnosed by the family's pediatrician (cited as basis for OHI)",
+      "source": "iep_sample.pdf",
+      "page": 1,
+      "quote": "outside diagnosis of Attention-Deficit/Hyperactivity Disorder, combined presentation,"
+    },
+    {
+      "text": "Attention-Deficit/Hyperactivity Disorder, combined presentation, diagnosed by Dana Okafor, PhD (neuropsychological evaluation)",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "1. Attention-Deficit/Hyperactivity Disorder, combined presentation."
+    },
+    {
+      "text": "Specific learning disorder with impairment in written expression, diagnosed by Dana Okafor, PhD",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "2. Specific learning disorder with"
+    },
+    {
+      "text": "Rule out generalized anxiety disorder, per Dana Okafor, PhD (provisional, needs follow-up)",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "3. Rule out generalized anxiety disorder; parent and self-report"
+    }
+  ],
+  "scores": [
+    {
+      "test": "WISC-V",
+      "measure": "Full Scale IQ (FSIQ)",
+      "score": "104",
+      "percentile": "61",
+      "source": "neuropsych_sample.pdf",
+      "page": 1,
+      "quote": "Full Scale IQ (FSIQ) 104 61"
+    },
+    {
+      "test": "WISC-V",
+      "measure": "Verbal Comprehension (VCI)",
+      "score": "112",
+      "percentile": "79",
+      "source": "neuropsych_sample.pdf",
+      "page": 1,
+      "quote": "Verbal Comprehension (VCI) 112 79"
+    },
+    {
+      "test": "WISC-V",
+      "measure": "Working Memory (WMI)",
+      "score": "86",
+      "percentile": "18",
+      "source": "neuropsych_sample.pdf",
+      "page": 1,
+      "quote": "Working Memory (WMI) 86 18"
+    },
+    {
+      "test": "WISC-V",
+      "measure": "Processing Speed (PSI)",
+      "score": "79",
+      "percentile": "8",
+      "source": "neuropsych_sample.pdf",
+      "page": 1,
+      "quote": "Processing Speed (PSI) 79 8"
+    },
+    {
+      "test": "WIAT-4",
+      "measure": "Written Expression",
+      "score": "81",
+      "percentile": "",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "Written Expression 81"
+    },
+    {
+      "test": "WIAT-4",
+      "measure": "Reading Comprehension",
+      "score": "101",
+      "percentile": "",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "Reading Comprehension 101"
+    },
+    {
+      "test": "WIAT-4",
+      "measure": "Math Problem Solving",
+      "score": "97",
+      "percentile": "",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "Math Problem Solving 97"
+    }
+  ],
+  "services": [
+    {
+      "text": "Specialized academic instruction (writing): 150 minutes weekly, resource room",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "Specialized academic instruction (writing) 150 minutes weekly Resource room"
+    },
+    {
+      "text": "School counseling: 30 minutes monthly, counseling office",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "School counseling 30 minutes monthly Counseling office"
+    }
+  ],
+  "accommodations": [
+    {
+      "text": "IEP: Extended time (time and a half) on tests and written assignments",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "Extended time (time and a half) on tests and written assignments."
+    },
+    {
+      "text": "IEP: Preferential seating near instruction",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "Preferential seating near instruction."
+    },
+    {
+      "text": "IEP: Chunked assignments with check-ins",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "Chunked assignments with check-ins."
+    },
+    {
+      "text": "IEP: Access to word processor for writing tasks",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "Access to word processor for writing tasks."
+    },
+    {
+      "text": "Prior 504 (superseded): preferential seating, movement breaks every 30 minutes, teacher-initiated homework reminders",
+      "source": "504_sample.pdf",
+      "page": 1,
+      "quote": "preferential seating; movement breaks every 30 minutes; teacher-initiated reminders"
+    }
+  ],
+  "concerns": [
+    {
+      "text": "Teacher (Ms. Rivera, English 10): Jordan completes about half of independent writing assignments",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "Jordan completes about half of independent writing"
+    },
+    {
+      "text": "Teacher (Ms. Rivera, English 10): frequently leaves seat and needs repeated redirection during whole-class instruction",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "frequently leaves his seat, and needs repeated redirection during whole-class instruction."
+    },
+    {
+      "text": "Parent: homework takes over three hours nightly and ends in arguments",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "homework takes over three hours nightly and ends in arguments"
+    },
+    {
+      "text": "Parent: Jordan calls himself 'stupid at school' and has stopped seeing friends on weekends",
+      "source": "iep_sample.pdf",
+      "page": 2,
+      "quote": "'stupid at school' and has stopped seeing friends on weekends."
+    },
+    {
+      "text": "Neuropsychologist (Dana Okafor, PhD): parent and self-report elevations suggestive of anxiety warrant follow-up",
+      "source": "neuropsych_sample.pdf",
+      "page": 2,
+      "quote": "elevations warrant follow-up."
+    }
+  ],
+  "gaps": [
+    {
+      "text": "No teacher ADHD rating scales on file",
+      "why": "The neuropsychologist specifically recommended collecting teacher ADHD rating scales before the psychiatry visit, and none are among the documents, leaving no cross-setting baseline for diagnosis or medication monitoring."
+    },
+    {
+      "text": "Anxiety and mood not yet assessed",
+      "why": "Generalized anxiety disorder is listed only as rule-out, and the parent reports negative self-talk ('stupid at school') and social withdrawal, but no anxiety or depression screening results are on file."
+    },
+    {
+      "text": "IEP missing the neuropsych-recommended reduced-distraction testing setting and broader assistive technology",
+      "why": "With Processing Speed at 79 (8th percentile) and Working Memory at 86 (18th percentile), the IEP includes extended time and a word processor but not the reduced-distraction setting or the broader writing assistive technology the evaluator recommended."
+    },
+    {
+      "text": "Movement breaks dropped from the 504 when the IEP replaced it",
+      "why": "The 2024 504 provided movement breaks every 30 minutes, which do not appear in the current IEP, even though the English teacher reports Jordan frequently leaves his seat."
+    },
+    {
+      "text": "No medication history or original pediatric ADHD workup on file",
+      "why": "The pediatrician's ADHD diagnosis is cited without a date, supporting rating scales or any record of prior medication trials, all of which are needed for the requested medication evaluation."
+    }
+  ],
+  "suggested_letter": {
+    "type": "IEP accommodation support letter",
+    "why": "A psychiatrist letter citing the ADHD diagnosis and the low processing speed and working memory scores could ask the IEP team to add the reduced-distraction testing setting, writing assistive technology and movement breaks that are missing from the current plan. The letter could also ask teachers to complete ADHD rating scales, which would support medication monitoring."
+  }
+}
